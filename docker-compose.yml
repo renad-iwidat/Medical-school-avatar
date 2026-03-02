@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  medical-avatar:
+    build: .
+    container_name: medical-avatar-app
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      # Add your OpenAI API key here or use .env file
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    restart: unless-stopped
+    volumes:
+      # Mount data directory for scenarios
+      - ./data:/app/data:ro
+    networks:
+      - medical-avatar-network
+
+networks:
+  medical-avatar-network:
+    driver: bridge

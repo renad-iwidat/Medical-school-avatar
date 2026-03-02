@@ -1,0 +1,27 @@
+{
+  "name": "medical-avatar-ai",
+  "version": "1.0.0",
+  "description": "Medical training avatar using AI for OSCE practice",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node src/index.js",
+    "start": "node src/index.js"
+  },
+  "keywords": [
+    "medical",
+    "osce",
+    "avatar",
+    "training",
+    "ai",
+    "websocket"
+  ],
+  "author": "Liminal Unit - An-Najah National University",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "express": "^4.18.0",
+    "openai": "^6.25.0",
+    "socket.io": "^4.8.3"
+  }
+}
