@@ -6,6 +6,7 @@ import { ScenarioManager } from './scenario-manager.js';
 import { SessionManager } from './session-manager.js';
 import { MedicalAvatarAgent } from './agent.js';
 import { HedraService } from './hedra-service.js';
+import { TTSService } from './tts-service.js';
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ const scenarioManager = new ScenarioManager();
 const sessionManager = new SessionManager();
 const agent = new MedicalAvatarAgent();
 const hedraService = new HedraService();
+const ttsService = new TTSService();
 
 // Get available scenarios
 app.get('/api/scenarios', (req, res) => {
@@ -128,6 +130,40 @@ app.get('/api/hedra-status', (req, res) => {
   res.json({ 
     enabled: hedraService.isEnabled(),
     message: hedraService.isEnabled() ? 'Hedra API is enabled' : 'Hedra API is not configured'
+  });
+});
+
+// Generate TTS audio
+app.post('/api/tts', async (req, res) => {
+  try {
+    const { text, gender } = req.body;
+    
+    if (!text) {
+      return res.status(400).json({ error: 'Missing text' });
+    }
+
+    const audioBuffer = await ttsService.generateSpeech(text, gender || 'female');
+    
+    if (!audioBuffer) {
+      return res.json({ status: 'fallback', message: 'TTS not available' });
+    }
+
+    res.set({
+      'Content-Type': 'audio/mpeg',
+      'Content-Length': audioBuffer.length
+    });
+    res.send(audioBuffer);
+  } catch (error) {
+    console.error('❌ TTS endpoint error:', error);
+    res.json({ status: 'fallback', message: 'TTS error' });
+  }
+});
+
+// Check TTS status
+app.get('/api/tts-status', (req, res) => {
+  res.json({ 
+    enabled: ttsService.isEnabled(),
+    message: ttsService.isEnabled() ? 'OpenAI TTS enabled' : 'TTS not configured'
   });
 });
 

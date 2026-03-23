@@ -439,93 +439,122 @@ function initializeSpeechRecognition() {
 }
 
 // Text-to-Speech Setup
-function speak(text) {
-    if ('speechSynthesis' in window) {
-        // Cancel any ongoing speech
-        speechSynthesis.cancel();
-        
-        // Show sound wave animation
-        const soundWave = document.getElementById('sound-wave');
-        if (soundWave) {
-            soundWave.classList.add('active');
-        }
-        
-        const utterance = new SpeechSynthesisUtterance(text);
-        
-        // Set language and voice parameters based on selected language
-        if (selectedLanguage === 'ar') {
-            utterance.lang = 'ar-SA';
-            utterance.rate = 1.4; // أسرع قليلاً
-            utterance.volume = 1.0; // صوت واضح جداً
-            utterance.pitch = 1.0;
-        } else {
-            utterance.lang = 'en-US';
-            utterance.rate = 1.4;
-            utterance.volume = 1.0;
-            utterance.pitch = 1.0;
-        }
-        
-        const voices = speechSynthesis.getVoices();
-        let selectedVoice = null;
-        
-        if (selectedLanguage === 'ar') {
-            // Use the DEFAULT Arabic voice (Microsoft Naayf)
-            selectedVoice = voices.find(voice => voice.default && voice.lang.startsWith('ar'));
-            
-            if (!selectedVoice) {
-                selectedVoice = voices.find(voice => voice.lang === 'ar-SA');
-            }
-            
-            if (selectedVoice) {
-                console.log('✅ Using Arabic voice:', selectedVoice.name);
-            }
-        } else {
-            // English voices
-            const preferredVoices = [
-                'Google US English',
-                'Microsoft David',
-                'Microsoft Mark',
-                'Microsoft Zira'
-            ];
-            
-            for (const preferred of preferredVoices) {
-                selectedVoice = voices.find(voice => 
-                    voice.name.includes(preferred) && voice.lang.startsWith('en')
-                );
-                if (selectedVoice) break;
-            }
-            
-            if (!selectedVoice) {
-                selectedVoice = voices.find(voice => voice.lang.startsWith('en-US'));
-            }
-        }
-        
-        if (selectedVoice) {
-            utterance.voice = selectedVoice;
-            console.log('🔊 Speaking | Voice:', selectedVoice.name, '| Rate:', utterance.rate, '| Volume:', utterance.volume);
-        }
-        
-        utterance.onstart = () => {
-            console.log('🔊 Started speaking');
-        };
-        
-        utterance.onerror = (event) => {
-            console.error('❌ Speech error:', event.error);
-            if (soundWave) {
-                soundWave.classList.remove('active');
-            }
-        };
-        
-        utterance.onend = () => {
-            console.log('✅ Speech completed');
-            if (soundWave) {
-                soundWave.classList.remove('active');
-            }
-        };
-        
-        speechSynthesis.speak(utterance);
+// Current audio element for TTS playback
+let currentAudio = null;
+let ttsEnabled = null; // null = not checked yet
+
+// Check TTS availability on load
+async function checkTTSStatus() {
+    try {
+        const response = await fetch('/api/tts-status');
+        const data = await response.json();
+        ttsEnabled = data.enabled;
+        console.log('🔊 TTS Status:', ttsEnabled ? 'OpenAI TTS enabled' : 'Using browser TTS');
+    } catch (e) {
+        ttsEnabled = false;
     }
 }
+
+async function speak(text) {
+    // Check TTS status if not checked yet
+    if (ttsEnabled === null) {
+        await checkTTSStatus();
+    }
+
+    // Stop any current audio
+    stopSpeaking();
+
+    const soundWave = document.getElementById('sound-wave');
+    if (soundWave) soundWave.classList.add('active');
+
+    // Try OpenAI TTS first
+    if (ttsEnabled) {
+        try {
+            const gender = currentScenario?.patientInfo?.gender || 'female';
+            console.log(`🔊 Using OpenAI TTS | Gender: ${gender}`);
+
+            const response = await fetch('/api/tts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text, gender })
+            });
+
+            if (response.ok && response.headers.get('content-type')?.includes('audio')) {
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+
+                currentAudio = new Audio(audioUrl);
+                currentAudio.onended = () => {
+                    if (soundWave) soundWave.classList.remove('active');
+                    URL.revokeObjectURL(audioUrl);
+                    currentAudio = null;
+                    console.log('✅ OpenAI TTS completed');
+                };
+                currentAudio.onerror = () => {
+                    if (soundWave) soundWave.classList.remove('active');
+                    URL.revokeObjectURL(audioUrl);
+                    currentAudio = null;
+                    console.log('⚠️ OpenAI TTS error, falling back to browser');
+                    speakWithBrowser(text, soundWave);
+                };
+
+                await currentAudio.play();
+                console.log('🔊 OpenAI TTS playing');
+                return;
+            }
+        } catch (e) {
+            console.log('⚠️ OpenAI TTS failed, falling back to browser:', e.message);
+        }
+    }
+
+    // Fallback to browser TTS
+    speakWithBrowser(text, soundWave);
+}
+
+function speakWithBrowser(text, soundWave) {
+    if (!('speechSynthesis' in window)) {
+        if (soundWave) soundWave.classList.remove('active');
+        return;
+    }
+
+    speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    if (selectedLanguage === 'ar') {
+        utterance.lang = 'ar-SA';
+        utterance.rate = 1.4;
+    } else {
+        utterance.lang = 'en-US';
+        utterance.rate = 1.4;
+    }
+    utterance.volume = 1.0;
+    utterance.pitch = 1.0;
+
+    const voices = speechSynthesis.getVoices();
+    let voice = null;
+    if (selectedLanguage === 'ar') {
+        voice = voices.find(v => v.default && v.lang.startsWith('ar')) || voices.find(v => v.lang === 'ar-SA');
+    } else {
+        voice = voices.find(v => v.lang.startsWith('en-US'));
+    }
+    if (voice) utterance.voice = voice;
+
+    utterance.onend = () => { if (soundWave) soundWave.classList.remove('active'); };
+    utterance.onerror = () => { if (soundWave) soundWave.classList.remove('active'); };
+
+    speechSynthesis.speak(utterance);
+}
+
+function stopSpeaking() {
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+    }
+}
+
 
 // Function to list all available voices (for debugging)
 function listAvailableVoices() {
@@ -622,11 +651,9 @@ document.getElementById('end-btn').addEventListener('click', async () => {
 
 async function endSession() {
     try {
-        // Stop speech synthesis immediately
-        if ('speechSynthesis' in window) {
-            speechSynthesis.cancel();
-            console.log('🔇 Speech stopped');
-        }
+        // Stop all audio immediately
+        stopSpeaking();
+        console.log('🔇 Speech stopped');
         
         // Stop microphone recording
         if (isRecording && recognition) {
@@ -668,10 +695,8 @@ function getItemName(key, lang) {
 
 // New session
 document.getElementById('new-session-btn').addEventListener('click', () => {
-    // Stop speech synthesis
-    if ('speechSynthesis' in window) {
-        speechSynthesis.cancel();
-    }
+    // Stop all audio
+    stopSpeaking();
     
     // Stop microphone recording
     if (isRecording && recognition) {
@@ -706,11 +731,10 @@ function initializeWebSocket() {
             const patientGender = currentScenario.patientInfo.gender;
             const patientLabel = patientGender === 'male' ? 'المريض' : 'المريضة';
             
-            const welcomeMsg = `مرحباً، أنا ${patientNameArabic}، ${patientLabel} الافتراضي الخاص بك اليوم.
-
-تم تطويري من قبل وحدة ليمينال في مركز الإعلام بجامعة النجاح الوطنية لتدريبك على مهاراتك السريرية بأمان وثقة.
-
-هيا نبدأ رحلتنا معاً بطريقة مريحة وممتعة!`;
+            const genderSuffix = patientGender === 'male' 
+                ? 'الافتراضي الخاص' 
+                : 'الافتراضية الخاصة';
+            const welcomeMsg = `مرحباً، أنا ${patientNameArabic}، ${patientLabel} ${genderSuffix} بك اليوم. تم تطويري من قبل وحدة ليمينال في جامعة النجاح لمساعدتك بالتدريب السريري. تفضل اسألني أي سؤال.`;
             
             addToTranscript('avatar', welcomeMsg);
             speak(welcomeMsg);
