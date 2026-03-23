@@ -39,20 +39,19 @@ export class MedicalAvatarAgent {
   }
 
   getWelcomeMessage(scenario, language = 'ar') {
+    const patientName = scenario.patientInfo.name;
+    const patientGender = scenario.patientInfo.gender === 'female' ? 'ة' : '';
+    
     if (language === 'ar') {
-      return `مرحباً، أنا أحمد، المريض الافتراضي الخاص بك اليوم.
+      return `مرحباً، أنا ${patientName}، المريضة الافتراضية الخاصة بك اليوم.
 
 تم تطويري من قبل وحدة ليمينال في مركز الإعلام بجامعة النجاح الوطنية لتدريبك على مهاراتك السريرية بأمان وثقة.
 
-لا تقلق، أنا صديقك اليوم وسأساعدك على الإجابة عن أي سؤال يخطر ببالك.
-
 هيا نبدأ رحلتنا معاً بطريقة مريحة وممتعة!`;
     } else {
-      return `Hello, I'm Ahmed, your virtual patient today.
+      return `Hello, I'm ${patientName}, your virtual patient today.
 
 I was developed by the Liminal Unit at the Media Center of An-Najah National University to help you practice your clinical skills safely and confidently.
-
-Don't worry, I'm your friend today and I'll help you answer any questions you have.
 
 Let's start our journey together in a comfortable and fun way!`;
     }
@@ -107,69 +106,744 @@ Let's start our journey together in a comfortable and fun way!`;
   generateResponse(scenario, question) {
     const questionLower = question.toLowerCase();
     
-    // Rule-based responses for common questions
-    if (questionLower.includes('اسم') || questionLower.includes('شو اسمك')) {
+    // Helper function to check if question contains any of the terms
+    const containsAny = (terms) => terms.some(term => questionLower.includes(term.toLowerCase()));
+    
+    // === PATIENT INFO ===
+    if (containsAny(['اسم', 'شو اسمك', 'name', 'what is your name'])) {
       return `اسمي ${scenario.patientInfo.name}`;
     }
     
-    if (questionLower.includes('عمر') || questionLower.includes('كم عمرك')) {
+    if (containsAny(['عمر', 'كم عمرك', 'age', 'how old'])) {
       return `عمري ${scenario.patientInfo.age} سنة`;
     }
     
-    if (questionLower.includes('شكوى') || questionLower.includes('مشكلة') || questionLower.includes('شو عندك')) {
-      return scenario.chiefComplaint;
+    if (containsAny(['مهنة', 'شغل', 'occupation', 'job', 'work'])) {
+      return `أنا ${scenario.patientInfo.occupation}`;
     }
     
-    if (questionLower.includes('بدأ') || questionLower.includes('متى') || questionLower.includes('وقت')) {
-      return scenario.presentingIllness.onset;
+    if (containsAny(['حالة اجتماعية', 'متزوجة', 'married', 'marital'])) {
+      return `أنا ${scenario.patientInfo.maritalStatus}`;
     }
     
-    if (questionLower.includes('نوع') || questionLower.includes('طبيعة') || questionLower.includes('كيف الألم')) {
-      return scenario.presentingIllness.character;
+    // === PRESENTING COMPLAINT ===
+    if (containsAny(['شكوى', 'مشكلة', 'شو عندك', 'complaint', 'problem', 'issue', 'presenting'])) {
+      return scenario.presentingComplaintFull;
     }
     
-    if (questionLower.includes('ينتشر') || questionLower.includes('يمتد') || questionLower.includes('وين بيروح') || questionLower.includes('وين')) {
-      return scenario.presentingIllness.radiation;
+    // === FATIGUE ===
+    if (containsAny(['إرهاق', 'تعب', 'إرهاق', 'fatigue', 'tired', 'exhaustion', 'weakness', 'how long'])) {
+      return `أشعر بالتعب منذ ${scenario.historyOfPresentingComplaint.fatigue.duration}، والحالة تزداد سوءاً`;
     }
     
-    if (questionLower.includes('شدة') || questionLower.includes('قوة') || questionLower.includes('كم درجة')) {
-      return `الألم شديد، حوالي ${scenario.presentingIllness.severity}`;
+    // === JOINT PAIN ===
+    if (containsAny(['ألم مفاصل', 'ألم يد', 'ألم معصم', 'joint pain', 'arthralgia', 'arthritis', 'hand pain', 'wrist pain'])) {
+      return `نعم، أشعر بألم في المفاصل الصغيرة في يدي والمعصمين، وهو ${scenario.historyOfPresentingComplaint.jointPain.pattern}`;
     }
     
-    if (questionLower.includes('أعراض') || questionLower.includes('معاه') || questionLower.includes('شي تاني')) {
-      return `نعم، عندي ${scenario.presentingIllness.associatedSymptoms.join('، ')}`;
+    if (containsAny(['تورم', 'احمرار', 'swelling', 'redness', 'inflammation'])) {
+      return `نعم، هناك ${scenario.historyOfPresentingComplaint.jointPain.swelling} و${scenario.historyOfPresentingComplaint.jointPain.redness}`;
     }
     
-    if (questionLower.includes('تدخين') || questionLower.includes('سجائر') || questionLower.includes('دخان')) {
-      return scenario.socialHistory.smoking;
+    if (containsAny(['تيبس صباح', 'morning stiffness', 'stiffness'])) {
+      return `نعم، أشعر بتيبس في الصباح يستمر ${scenario.historyOfPresentingComplaint.jointPain.morningStiffness}`;
     }
     
-    if (questionLower.includes('سكري') || questionLower.includes('ضغط') || questionLower.includes('أمراض سابقة')) {
-      return `نعم، عندي ${scenario.pastMedicalHistory.conditions.join('، ')}`;
+    if (containsAny(['تشوه', 'deformity', 'deformities'])) {
+      return `${scenario.historyOfPresentingComplaint.jointPain.deformities}`;
     }
     
-    if (questionLower.includes('أدوية') || questionLower.includes('علاج') || questionLower.includes('دوا')) {
-      return `آخذ ${scenario.pastMedicalHistory.medications.join('، ')}`;
+    // === FACIAL RASH ===
+    if (containsAny(['طفح', 'حمامي', 'رash', 'rash', 'malar', 'facial rash', 'cheeks', 'nose'])) {
+      return `نعم، لدي طفح على وجهي يظهر بعد التعرض للشمس، على الخدين والأنف`;
     }
     
-    if (questionLower.includes('عائلة') || questionLower.includes('أهل') || questionLower.includes('والد')) {
-      return scenario.familyHistory.cardiovascular;
+    if (containsAny(['حساسية ضوء', 'photosensitivity', 'sun exposure', 'light sensitivity'])) {
+      return `نعم، أشعر بحساسية من الضوء والشمس`;
     }
     
-    if (questionLower.includes('ضغط الدم') || questionLower.includes('قياس')) {
-      return `ضغطي ${scenario.physicalExam.vitals.bp}`;
+    // === ORAL ULCERS ===
+    if (containsAny(['قرح فم', 'قرح', 'oral ulcers', 'mouth ulcers', 'ulcers'])) {
+      return `نعم، لدي قرح متكررة في الفم وهي غير مؤلمة`;
     }
-
-    if (questionLower.includes('نبض') || questionLower.includes('دقات القلب')) {
-      return `نبضي ${scenario.physicalExam.vitals.hr}`;
+    
+    // === HAIR LOSS ===
+    if (containsAny(['تساقط شعر', 'hair loss', 'alopecia'])) {
+      return `نعم، أعاني من تساقط الشعر`;
     }
-
-    if (questionLower.includes('حرارة')) {
-      return `حرارتي ${scenario.physicalExam.vitals.temp}`;
+    
+    // === FEVER ===
+    if (containsAny(['حمى', 'حرارة', 'fever', 'temperature'])) {
+      return `نعم، لدي ${scenario.historyOfPresentingComplaint.fever.type}`;
+    }
+    
+    // === LEG SWELLING ===
+    if (containsAny(['تورم ساق', 'تورم رجل', 'leg swelling', 'edema', 'lower limb'])) {
+      return `نعم، ${scenario.historyOfPresentingComplaint.legSwelling.description}`;
+    }
+    
+    // === SYSTEMATIC REVIEW ===
+    if (containsAny(['ظاهرة رينود', 'raynaud', 'pale fingers', 'cold'])) {
+      return `${scenario.systematicReview.raynaudsPhenomenon.answer}`;
+    }
+    
+    if (containsAny(['ألم صدر', 'chest pain', 'pleuritic', 'pleurisy'])) {
+      return `${scenario.systematicReview.chestPain.answer}`;
+    }
+    
+    if (containsAny(['ضيق نفس', 'سعال', 'shortness of breath', 'dyspnea', 'cough', 'respiratory'])) {
+      return `لا، لا أعاني من ضيق النفس أو السعال`;
+    }
+    
+    if (containsAny(['تغيير بول', 'بول رغوي', 'urine changes', 'frothy urine', 'hematuria', 'dysuria'])) {
+      return `نعم، ${scenario.systematicReview.urineChanges.description}`;
+    }
+    
+    if (containsAny(['نوبات', 'ذهان', 'seizures', 'psychosis', 'neurological'])) {
+      return `لا، لا أعاني من نوبات أو أعراض نفسية`;
+    }
+    
+    if (containsAny(['إجهاض', 'حمل', 'miscarriage', 'pregnancy', 'obstetric'])) {
+      return `${scenario.systematicReview.miscarriages.history}`;
+    }
+    
+    // === PAST MEDICAL HISTORY ===
+    if (containsAny(['سوابق مرضية', 'أمراض سابقة', 'past medical history', 'pmh', 'chronic illness'])) {
+      return `${scenario.pastMedicalHistory.chronicIllness}`;
+    }
+    
+    // === DRUG HISTORY ===
+    if (containsAny(['أدوية', 'علاج', 'دوا', 'medication', 'medicine', 'drug', 'taking'])) {
+      return `${scenario.drugHistory.medications}`;
+    }
+    
+    // === ALLERGIES ===
+    if (containsAny(['حساسية', 'allergy', 'allergies', 'nkda'])) {
+      return `${scenario.allergies.drugAllergies}`;
+    }
+    
+    // === SOCIAL HISTORY ===
+    if (containsAny(['تدخين', 'smoking', 'smoke', 'cigarette'])) {
+      return `${scenario.socialHistory.smoking}`;
+    }
+    
+    if (containsAny(['كحول', 'alcohol', 'drink'])) {
+      return `لا أشرب الكحول`;
+    }
+    
+    if (containsAny(['مخدرات', 'recreational', 'drugs'])) {
+      return `${scenario.socialHistory.recreationalDrugs}`;
+    }
+    
+    // === FAMILY HISTORY ===
+    if (containsAny(['عائلة', 'أهل', 'والد', 'والدة', 'family', 'father', 'mother', 'aunt', 'relative'])) {
+      return `${scenario.familyHistory.rheumatologicalDisease}`;
+    }
+    
+    // === INVESTIGATIONS ===
+    if (containsAny(['فحوصات', 'تحاليل', 'investigations', 'tests', 'blood test', 'lab'])) {
+      return `تم إجراء عدة فحوصات دم وتحليل بول`;
+    }
+    
+    if (containsAny(['هيموجلوبين', 'hemoglobin', 'hb', 'anemia'])) {
+      return `الهيموجلوبين 10.2 g/dL`;
+    }
+    
+    if (containsAny(['كريات دم بيضاء', 'wbc', 'white blood cells', 'leukocytes'])) {
+      return `كريات الدم البيضاء 3.2 ×10⁹/L`;
+    }
+    
+    if (containsAny(['صفائح', 'platelets', 'thrombocytes'])) {
+      return `الصفائح الدموية 110 ×10⁹/L`;
+    }
+    
+    if (containsAny(['كرياتينين', 'creatinine', 'renal function', 'kidney'])) {
+      return `الكرياتينين 1.9 mg/dL`;
+    }
+    
+    if (containsAny(['يوريا', 'urea', 'bun'])) {
+      return `اليوريا 60 mg/dL`;
+    }
+    
+    if (containsAny(['ana', 'antinuclear antibody'])) {
+      return `ANA إيجابي`;
+    }
+    
+    if (containsAny(['anti-dsna', 'anti-dsdna', 'dsdna'])) {
+      return `Anti-dsDNA 1:320`;
+    }
+    
+    if (containsAny(['complement', 'c3', 'c4'])) {
+      return `C3 و C4 منخفضة`;
+    }
+    
+    if (containsAny(['بروتين', 'protein', 'proteinuria'])) {
+      return `البروتين في البول +++`;
+    }
+    
+    if (containsAny(['دم بول', 'blood', 'hematuria'])) {
+      return `الدم في البول ++`;
+    }
+    
+    // === DIAGNOSIS ===
+    if (containsAny(['تشخيص', 'diagnosis', 'sle', 'lupus', 'systemic lupus'])) {
+      return `التشخيص هو الذئبة الحمراء الجهازية مع التهاب الكلى الذئبي`;
+    }
+    
+    // === MANAGEMENT ===
+    if (containsAny(['علاج', 'management', 'treatment', 'medication'])) {
+      return `العلاج يشمل هيدروكسي كلوروكين والكورتيكوستيرويدات والعلاج المثبط للمناعة`;
+    }
+    
+    if (containsAny(['حماية شمس', 'sun protection', 'uv'])) {
+      return `يجب تجنب التعرض للشمس والأشعة فوق البنفسجية`;
+    }
+    
+    if (containsAny(['روماتيزم', 'rheumatology', 'specialist'])) {
+      return `نعم، يجب إحالتي إلى أخصائي الروماتيزم`;
+    }
+    
+    // === CUSHING SYNDROME SPECIFIC ===
+    if (containsAny(['كسر', 'fracture', 'radius', 'ulnar', 'trauma', 'fall', 'bone'])) {
+      return `نعم، كسرت ذراعي بعد سقوط بسيط في البيت منذ أسبوع`;
+    }
+    
+    if (containsAny(['وزن', 'weight gain', 'obesity', 'central obesity', 'abdominal'])) {
+      return `نعم، اكتسبت حوالي 10 كيلوغرامات على مدى سنتين، معظمها حول البطن`;
+    }
+    
+    if (containsAny(['إرهاق', 'fatigue', 'tired', 'tiredness', 'exhaustion', 'weakness'])) {
+      return `نعم، أشعر بالإرهاق منذ سنة أو سنتين`;
+    }
+    
+    if (containsAny(['ضعف عضلات', 'muscle weakness', 'proximal weakness', 'climbing stairs'])) {
+      return `نعم، أشعر بصعوبة في صعود السلالم`;
+    }
+    
+    if (containsAny(['حب شباب', 'acne', 'skin lesions'])) {
+      return `نعم، ظهر لدي حب شباب مؤخراً`;
+    }
+    
+    if (containsAny(['كدمات', 'easy bruising', 'bruising'])) {
+      return `لا، لا أعاني من كدمات سهلة`;
+    }
+    
+    if (containsAny(['خطوط أرجوانية', 'purple striae', 'striae'])) {
+      return `لا، لا توجد خطوط أرجوانية`;
+    }
+    
+    if (containsAny(['شعر زائد', 'hirsutism'])) {
+      return `لا، لا أعاني من شعر زائد`;
+    }
+    
+    if (containsAny(['دورة شهرية', 'irregular menstruation', 'menstrual'])) {
+      return `لا، دورتي الشهرية منتظمة`;
+    }
+    
+    if (containsAny(['صوت', 'voice changes', 'voice deepening'])) {
+      return `لا، صوتي لم يتغير`;
+    }
+    
+    if (containsAny(['ضغط دم', 'hypertension', 'blood pressure', 'bp'])) {
+      return `نعم، تم تشخيصي بارتفاع ضغط الدم قبل بضعة أشهر`;
+    }
+    
+    if (containsAny(['أملوديبين', 'amlodipine'])) {
+      return `نعم، أتناول أملوديبين لارتفاع ضغط الدم`;
+    }
+    
+    if (containsAny(['كورتيكوستيرويد', 'steroid', 'oral steroid', 'inhaled steroid', 'topical steroid'])) {
+      return `لا، لم أتناول أي كورتيكوستيرويدات`;
+    }
+    
+    if (containsAny(['وجه قمري', 'moon face'])) {
+      return `قد يكون وجهي مستديراً قليلاً`;
+    }
+    
+    if (containsAny(['تهيج', 'irritability', 'mood changes'])) {
+      return `نعم، أشعر بتهيج خفيف أحياناً`;
+    }
+    
+    if (containsAny(['سعال', 'cough', 'respiratory'])) {
+      return `لا، لا أعاني من سعال`;
+    }
+    
+    if (containsAny(['ضيق نفس', 'shortness of breath', 'dyspnea'])) {
+      return `لا، لا أعاني من ضيق النفس`;
+    }
+    
+    if (containsAny(['حرارة', 'fever', 'temperature'])) {
+      return `لا، لا أعاني من حمى`;
+    }
+    
+    if (containsAny(['عرق ليلي', 'night sweats'])) {
+      return `لا، لا أعاني من عرق ليلي`;
+    }
+    
+    if (containsAny(['ألم صدر', 'chest pain'])) {
+      return `لا، لا أعاني من ألم في الصدر`;
+    }
+    
+    if (containsAny(['خفقان', 'palpitations'])) {
+      return `لا، لا أعاني من خفقان`;
+    }
+    
+    if (containsAny(['تبول كثير', 'polyuria'])) {
+      return `لا، لا أعاني من تبول كثير`;
+    }
+    
+    if (containsAny(['عطش', 'polydipsia'])) {
+      return `لا، لا أعاني من عطش شديد`;
+    }
+    
+    if (containsAny(['ألم بطن', 'abdominal pain'])) {
+      return `لا، لا أعاني من ألم في البطن`;
+    }
+    
+    if (containsAny(['براز', 'bowel habits'])) {
+      return `لا، لم تتغير عادات الإخراج لدي`;
+    }
+    
+    if (containsAny(['صداع', 'headaches'])) {
+      return `لا، لا أعاني من صداع`;
+    }
+    
+    if (containsAny(['رؤية', 'visual disturbances'])) {
+      return `لا، لا أعاني من مشاكل في الرؤية`;
+    }
+    
+    if (containsAny(['اكتئاب', 'depression'])) {
+      return `لا، لا أعاني من اكتئاب`;
+    }
+    
+    if (containsAny(['سكري', 'diabetes'])) {
+      return `لا، لا أعاني من السكري`;
+    }
+    
+    if (containsAny(['غدة درقية', 'thyroid disease'])) {
+      return `لا، لا أعاني من أمراض الغدة الدرقية`;
+    }
+    
+    if (containsAny(['تدخين', 'smoking', 'smoke'])) {
+      return `لا، أنا لا أدخن`;
+    }
+    
+    if (containsAny(['كحول', 'alcohol'])) {
+      return `لا، لا أشرب الكحول`;
+    }
+    
+    if (containsAny(['مخدرات', 'drug use', 'drugs'])) {
+      return `لا، لا أستخدم أي مخدرات`;
+    }
+    
+    if (containsAny(['عائلة', 'family history', 'aunt', 'relative'])) {
+      return `لا، لا توجد أمراض غدية أو هشاشة عظام في العائلة`;
+    }
+    
+    if (containsAny(['فحوصات', 'tests', 'investigations', 'blood test'])) {
+      return `لم يتم إجراء فحوصات تفصيلية حتى الآن`;
+    }
+    
+    if (containsAny(['cortisol', 'كورتيزول'])) {
+      return `لا أعرف مستويات الكورتيزول لدي`;
+    }
+    
+    if (containsAny(['acth', 'أكث'])) {
+      return `لا أعرف مستويات ACTH لدي`;
+    }
+    
+    if (containsAny(['dexamethasone', 'ديكساميثازون'])) {
+      return `لم أجري اختبار ديكساميثازون`;
+    }
+    
+    if (containsAny(['dexa', 'bone density', 'كثافة عظام'])) {
+      return `لم أجري فحص DEXA`;
+    }
+    
+    if (containsAny(['hba1c', 'glucose', 'سكر الدم'])) {
+      return `لا أعرف مستويات السكر لدي`;
+    }
+    
+    if (containsAny(['lipid', 'كوليسترول'])) {
+      return `لا أعرف مستويات الكوليسترول لدي`;
+    }
+    
+    if (containsAny(['electrolytes', 'potassium', 'بوتاسيوم'])) {
+      return `لا أعرف مستويات الأملاح لدي`;
+    }
+    
+    if (containsAny(['cushing', 'كوشينج'])) {
+      return `لا أعرف ما هو متلازمة كوشينج`;
+    }
+    
+    if (containsAny(['osteoporosis', 'هشاشة عظام'])) {
+      return `قد يكون لدي هشاشة عظام بسبب الكسر`;
+    }
+    
+    if (containsAny(['pathological fracture', 'كسر مرضي'])) {
+      return `الطبيب قال أن الكسر غير متوقع من سقوط بسيط`;
+    }
+    
+    // === SARCOIDOSIS SPECIFIC ===
+    if (containsAny(['سعال', 'cough', 'dry cough', 'bad cough'])) {
+      return `نعم، لدي سعال جاف سيء منذ شهر، يزداد سوءاً`;
+    }
+    
+    if (containsAny(['ضيق نفس', 'shortness of breath', 'dyspnea', 'exertional'])) {
+      return `نعم، أشعر بضيق النفس خاصة عند بذل مجهود`;
+    }
+    
+    if (containsAny(['طفح', 'rash', 'erythema nodosum', 'skin rash'])) {
+      return `نعم، لاحظت طفح على ساقي`;
+    }
+    
+    if (containsAny(['حمى', 'fever', 'feverish', 'temperature'])) {
+      return `نعم، أشعر بحمى أحياناً، درجة الحرارة وصلت إلى 38 درجة`;
+    }
+    
+    if (containsAny(['إمساك', 'constipation'])) {
+      return `نعم، أعاني من إمساك`;
+    }
+    
+    if (containsAny(['سفر', 'travel', 'infections', 'عدوى'])) {
+      return `لا، لم أسافر ولم أتعرض لعدوى مؤخراً`;
+    }
+    
+    if (containsAny(['تدخين', 'smoking', 'smoke'])) {
+      return `لا، أنا لا أدخن`;
+    }
+    
+    if (containsAny(['شراب سعال', 'cough syrup'])) {
+      return `جربت شراب السعال لكنه لم يساعد`;
+    }
+    
+    if (containsAny(['عدوى تنفسية', 'upper respiratory', 'URI'])) {
+      return `نعم، أحياناً أصاب بعدوى تنفسية عليا تزول في أسبوع`;
+    }
+    
+    if (containsAny(['إرهاق', 'fatigue', 'tired'])) {
+      return `نعم، أشعر بالإرهاق`;
+    }
+    
+    if (containsAny(['وزن', 'overweight', 'weight'])) {
+      return `نعم، أنا أعاني من زيادة الوزن`;
+    }
+    
+    if (containsAny(['لحم أحمر', 'red meat', 'diet'])) {
+      return `أتناول اللحم الأحمر أحياناً والمشروبات السكرية`;
+    }
+    
+    if (containsAny(['كحول', 'alcohol'])) {
+      return `لا، لا أشرب الكحول`;
+    }
+    
+    if (containsAny(['مخدرات', 'recreational drugs'])) {
+      return `لا، لا أستخدم أي مخدرات`;
+    }
+    
+    if (containsAny(['ضغط دم', 'hypertension', 'blood pressure'])) {
+      return `نعم، لدي ارتفاع في ضغط الدم`;
+    }
+    
+    if (containsAny(['ألم صدر', 'chest pain'])) {
+      return `لا، لا أعاني من ألم في الصدر`;
+    }
+    
+    if (containsAny(['ألم بطن', 'abdominal pain'])) {
+      return `لا، لا أعاني من ألم في البطن`;
+    }
+    
+    if (containsAny(['أعراض بولية', 'urinary symptoms'])) {
+      return `لا، لا أعاني من أعراض بولية`;
+    }
+    
+    if (containsAny(['أعراض عصبية', 'neurological symptoms'])) {
+      return `لا، لا أعاني من أعراض عصبية`;
+    }
+    
+    if (containsAny(['فقدان وزن', 'weight loss'])) {
+      return `لا، لم أفقد وزناً`;
+    }
+    
+    if (containsAny(['ild', 'interstitial lung disease', 'مرض الرئة'])) {
+      return `قد يكون لدي مرض رئوي خلالي`;
+    }
+    
+    if (containsAny(['tb', 'tuberculosis', 'سل'])) {
+      return `لا أعرف إن كان لدي سل`;
+    }
+    
+    if (containsAny(['viral', 'fungal', 'فيروسي', 'فطري'])) {
+      return `قد تكون العدوى فيروسية أو فطرية`;
+    }
+    
+    if (containsAny(['foreign body', 'جسم غريب'])) {
+      return `لا أعتقد أنني استنشقت جسماً غريباً`;
+    }
+    
+    if (containsAny(['cbc', 'complete blood count', 'تعداد دم'])) {
+      return `لم أجري تعداد دم كامل`;
+    }
+    
+    if (containsAny(['crp', 'c-reactive protein', 'بروتين سي'])) {
+      return `لا أعرف مستوى بروتين سي التفاعلي`;
+    }
+    
+    if (containsAny(['abg', 'arterial blood gas', 'غاز دم'])) {
+      return `لم أجري فحص غاز الدم`;
+    }
+    
+    if (containsAny(['calcium', 'vitamin d', 'كالسيوم', 'فيتامين د'])) {
+      return `لا أعرف مستويات الكالسيوم وفيتامين د`;
+    }
+    
+    if (containsAny(['chest ct', 'ct scan', 'تصوير مقطعي'])) {
+      return `لم أجري تصوير مقطعي للصدر`;
+    }
+    
+    if (containsAny(['bilateral hilar', 'تضخم عقد', 'lymphadenopathy'])) {
+      return `قد يكون لدي تضخم في العقد اللمفاوية`;
+    }
+    
+    if (containsAny(['reticular infiltrates', 'تسللات شبكية'])) {
+      return `قد تكون هناك تسللات شبكية في الرئتين`;
+    }
+    
+    if (containsAny(['sarcoidosis', 'ساركويدوسيس'])) {
+      return `لا أعرف ما هي الساركويدوسيس`;
+    }
+    
+    if (containsAny(['lung biopsy', 'خزعة رئة'])) {
+      return `لم أجري خزعة رئة`;
+    }
+    
+    if (containsAny(['arthralgia', 'joint pain', 'ألم مفاصل'])) {
+      return `لا، لا أعاني من ألم في المفاصل`;
+    }
+    
+    if (containsAny(['neck swelling', 'تورم رقبة'])) {
+      return `لا، لا توجد تورم في الرقبة`;
+    }
+    
+    if (containsAny(['uveitis', 'التهاب العنبية'])) {
+      return `لا، لا أعاني من مشاكل في العيون`;
+    }
+    
+    if (containsAny(['splenomegaly', 'تضخم الطحال'])) {
+      return `لا أعرف إن كان الطحال متضخماً`;
+    }
+    
+    if (containsAny(['hypercalcemia', 'ارتفاع كالسيوم'])) {
+      return `لا أعرف إن كان لدي ارتفاع في الكالسيوم`;
+    }
+    
+    if (containsAny(['corticosteroids', 'steroids', 'كورتيكوستيرويد'])) {
+      return `لم أتناول أي كورتيكوستيرويدات`;
+    }
+    
+    if (containsAny(['fibrosis', 'تليف', 'pulmonary hypertension'])) {
+      return `أتمنى ألا أصاب بمضاعفات خطيرة`;
+    }
+    
+    if (containsAny(['bronchiectasis', 'توسع الشعب'])) {
+      return `لا أعرف إن كان لدي توسع في الشعب الهوائية`;
+    }
+    
+    if (containsAny(['arrhythmias', 'heart failure', 'عدم انتظام ضربات'])) {
+      return `لا، لا أعاني من مشاكل في القلب`;
+    }
+    
+    if (containsAny(['glaucoma', 'cataracts', 'blindness', 'جلوكوما'])) {
+      return `لا، لا أعاني من مشاكل في الرؤية`;
+    }
+    
+    if (containsAny(['cranial nerve palsy', 'seizures', 'neuropathy', 'شلل عصبي'])) {
+      return `لا، لا أعاني من أعراض عصبية`;
+    }
+    
+    if (containsAny(['kidney stones', 'renal failure', 'حصى كلى'])) {
+      return `لا، لا أعاني من مشاكل في الكلى`;
+    }
+    
+    // === GOUT SPECIFIC ===
+    if (containsAny(['ألم ركبة', 'knee pain', 'right knee', 'severe pain'])) {
+      return `نعم، ألم شديد جداً في الركبة اليمنى، استيقظني من النوم الساعة الثانية صباحاً`;
+    }
+    
+    if (containsAny(['تورم', 'swelling', 'swollen'])) {
+      return `نعم، الركبة متورمة وحمراء وساخنة`;
+    }
+    
+    if (containsAny(['دفء', 'warmth', 'warm'])) {
+      return `نعم، الركبة دافئة جداً`;
+    }
+    
+    if (containsAny(['احمرار', 'redness', 'erythematous'])) {
+      return `نعم، هناك احمرار واضح على الركبة`;
+    }
+    
+    if (containsAny(['صعوبة المشي', 'difficulty walking', 'walking'])) {
+      return `نعم، لا أستطيع المشي بسبب الألم الشديد`;
+    }
+    
+    if (containsAny(['حركة', 'movement', 'motion'])) {
+      return `أي حركة تزيد الألم بشكل كبير`;
+    }
+    
+    if (containsAny(['لمس', 'touch', 'touching'])) {
+      return `حتى لمس الركبة بخفة يسبب ألماً شديداً`;
+    }
+    
+    if (containsAny(['صدمة', 'trauma', 'injury'])) {
+      return `لا، لم أتعرض لأي صدمة أو إصابة`;
+    }
+    
+    if (containsAny(['إصبع القدم', 'big toe', 'podagra', 'toe'])) {
+      return `نعم، قبل سنة تقريباً كان لدي ألم وتورم في قاعدة إصبع القدم الكبير الأيسر`;
+    }
+    
+    if (containsAny(['حمى', 'fever', 'feverish'])) {
+      return `أشعر بحمى خفيفة`;
+    }
+    
+    if (containsAny(['وزن', 'overweight', 'obesity'])) {
+      return `نعم، أنا أعاني من زيادة الوزن`;
+    }
+    
+    if (containsAny(['لحم أحمر', 'red meat'])) {
+      return `أتناول اللحم الأحمر أحياناً`;
+    }
+    
+    if (containsAny(['مشروبات سكرية', 'sugary beverages'])) {
+      return `نعم، أشرب المشروبات السكرية بانتظام`;
+    }
+    
+    if (containsAny(['رامبريل', 'ramipril', 'ace inhibitor'])) {
+      return `نعم، أتناول رامبريل لارتفاع ضغط الدم`;
+    }
+    
+    if (containsAny(['هيدروكلوروثيازيد', 'hydrochlorothiazide', 'hctz', 'diuretic'])) {
+      return `نعم، أتناول هيدروكلوروثيازيد أيضاً`;
+    }
+    
+    if (containsAny(['ضغط دم', 'hypertension', 'blood pressure'])) {
+      return `نعم، لدي ارتفاع في ضغط الدم منذ 5 سنوات`;
+    }
+    
+    if (containsAny(['سعال', 'cough'])) {
+      return `لا، لا أعاني من سعال`;
+    }
+    
+    if (containsAny(['ألم صدر', 'chest pain'])) {
+      return `لا، لا أعاني من ألم في الصدر`;
+    }
+    
+    if (containsAny(['ألم بطن', 'abdominal pain'])) {
+      return `لا، لا أعاني من ألم في البطن`;
+    }
+    
+    if (containsAny(['إسهال', 'diarrhea'])) {
+      return `لا، لا أعاني من إسهال`;
+    }
+    
+    if (containsAny(['أعراض بولية', 'urinary symptoms'])) {
+      return `لا، لا أعاني من أعراض بولية`;
+    }
+    
+    if (containsAny(['طفح', 'rash'])) {
+      return `لا، لا يوجد طفح`;
+    }
+    
+    if (containsAny(['فقدان وزن', 'weight loss'])) {
+      return `لا، لم أفقد وزناً`;
+    }
+    
+    if (containsAny(['تدخين', 'smoking'])) {
+      return `لا، لا أدخن`;
+    }
+    
+    if (containsAny(['كحول', 'alcohol'])) {
+      return `لا، لا أشرب الكحول`;
+    }
+    
+    if (containsAny(['سفر', 'travel'])) {
+      return `لا، لم أسافر مؤخراً`;
+    }
+    
+    if (containsAny(['عدوى', 'infection'])) {
+      return `لا، لم أتعرض لعدوى مؤخراً`;
+    }
+    
+    if (containsAny(['ibuprofen', 'إيبوبروفين'])) {
+      return `نعم، تحسنت الحالة بعد تناول الإيبوبروفين في المرة السابقة`;
+    }
+    
+    if (containsAny(['joint aspiration', 'شفط المفصل', 'synovial fluid'])) {
+      return `لم أجري شفط للمفصل بعد`;
+    }
+    
+    if (containsAny(['cell count', 'wbc', 'تعداد خلايا'])) {
+      return `لا أعرف تعداد الخلايا`;
+    }
+    
+    if (containsAny(['gram stain', 'culture', 'بكتيريا'])) {
+      return `لا أعرف نتائج الزراعة`;
+    }
+    
+    if (containsAny(['crystal analysis', 'polarized light', 'بلورات'])) {
+      return `لا أعرف عن تحليل البلورات`;
+    }
+    
+    if (containsAny(['septic arthritis', 'عدوى المفصل'])) {
+      return `آمل ألا تكون عدوى في المفصل`;
+    }
+    
+    if (containsAny(['gout', 'gouty arthritis', 'نقرس'])) {
+      return `لا أعرف ما هو النقرس`;
+    }
+    
+    if (containsAny(['hyperuricemia', 'uric acid', 'حمض اليوريك'])) {
+      return `لا أعرف مستويات حمض اليوريك لدي`;
+    }
+    
+    if (containsAny(['metabolic syndrome', 'renal failure', 'kidney'])) {
+      return `لا أعرف إن كان لدي مشاكل في الكلى`;
+    }
+    
+    if (containsAny(['thiazide', 'tumor lysis', 'عوامل الخطر'])) {
+      return `لا أعرف عوامل الخطر`;
+    }
+    
+    if (containsAny(['allopurinol', 'febuxostat', 'probenecid'])) {
+      return `لم أتناول أي من هذه الأدوية`;
+    }
+    
+    if (containsAny(['colchicine', 'كولشيسين'])) {
+      return `لا أعرف عن الكولشيسين`;
+    }
+    
+    if (containsAny(['nsaids', 'indomethacin', 'naproxen'])) {
+      return `أتناول الإيبوبروفين أحياناً للألم`;
+    }
+    
+    if (containsAny(['corticosteroids', 'steroids', 'كورتيكوستيرويد'])) {
+      return `لم أتناول أي كورتيكوستيرويدات`;
+    }
+    
+    if (containsAny(['bmi', 'body mass index', 'مؤشر كتلة'])) {
+      return `وزني 106 كيلوغرام وطولي 170 سنتيمتر`;
+    }
+    
+    if (containsAny(['effusion', 'تجمع سائل'])) {
+      return `نعم، هناك تجمع سائل في الركبة`;
+    }
+    
+    if (containsAny(['range of motion', 'حركة المفصل'])) {
+      return `حركة الركبة محدودة جداً بسبب الألم والتورم`;
     }
     
     // Default response
-    return 'معذرة، ممكن تعيد السؤال بطريقة أوضح؟';
+    return 'معذرة، ممكن تعيدي السؤال بطريقة أوضح؟';
   }
 
   getConversationHistory(roomName) {

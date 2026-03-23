@@ -32,12 +32,16 @@ export class ScenarioManager {
   }
 
   listScenarios() {
-    return Array.from(this.scenarios.values()).map(s => ({
+    const scenarios = Array.from(this.scenarios.values()).map(s => ({
       id: s.id,
       title: s.title,
       difficulty: s.difficulty,
       chiefComplaint: s.chiefComplaint
     }));
+    
+    console.log(`📋 Returning ${scenarios.length} scenarios:`, scenarios.map(s => s.id));
+    
+    return scenarios;
   }
 
   getScenario(id) {

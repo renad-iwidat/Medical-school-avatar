@@ -7,8 +7,8 @@ let socket = null; // WebSocket connection
 // Fallback translations if translations.js not loaded
 if (typeof translations === 'undefined') {
     window.translations = {
-        ar: { you: 'أنت', patient: 'المريض', system: 'النظام', name: 'الاسم:', age: 'العمر:', gender: 'الجنس:', occupation: 'المهنة:', male: 'ذكر', female: 'أنثى', years: 'سنة', from: 'من', points: 'نقطة' },
-        en: { you: 'You', patient: 'Patient', system: 'System', name: 'Name:', age: 'Age:', gender: 'Gender:', occupation: 'Occupation:', male: 'Male', female: 'Female', years: 'years old', from: 'out of', points: 'points' }
+        ar: { you: 'أنت', patient: 'المريض', system: 'النظام', name: 'الاسم:', age: 'العمر:', gender: 'الجنس:', occupation: 'المهنة:', male: 'ذكر', female: 'أنثى', years: 'سنة' },
+        en: { you: 'You', patient: 'Patient', system: 'System', name: 'Name:', age: 'Age:', gender: 'Gender:', occupation: 'Occupation:', male: 'Male', female: 'Female', years: 'years old' }
     };
 }
 
@@ -22,35 +22,13 @@ if (typeof updateUILanguage === 'undefined') {
 // Fallback for getCategoryName and getItemName
 if (typeof getCategoryName === 'undefined') {
     window.getCategoryName = function(category, lang) {
-        const names = {
-            ar: { history: 'القصة المرضية', examination: 'الفحص السريري', investigations: 'الفحوصات', diagnosis: 'التشخيص', management: 'الخطة العلاجية' },
-            en: { history: 'History Taking', examination: 'Physical Examination', investigations: 'Investigations', diagnosis: 'Diagnosis', management: 'Management Plan' }
-        };
-        return names[lang][category] || category;
+        return category;
     };
 }
 
 if (typeof getItemName === 'undefined') {
     window.getItemName = function(key, lang) {
-        const names = {
-            ar: {
-                chiefComplaint: 'الشكوى الرئيسية', onset: 'بداية الأعراض', character: 'طبيعة الألم',
-                radiation: 'انتشار الألم', severity: 'شدة الألم', associatedSymptoms: 'الأعراض المصاحبة',
-                riskFactors: 'عوامل الخطورة', pastMedicalHistory: 'السوابق المرضية', medications: 'الأدوية',
-                familyHistory: 'التاريخ العائلي', vitals: 'العلامات الحيوية', cardiovascular: 'فحص القلب',
-                respiratory: 'فحص الجهاز التنفسي', ecg: 'تخطيط القلب', cardiacMarkers: 'إنزيمات القلب',
-                correctDiagnosis: 'التشخيص الصحيح', immediateManagement: 'الإسعافات الأولية'
-            },
-            en: {
-                chiefComplaint: 'Chief Complaint', onset: 'Onset of Symptoms', character: 'Character of Pain',
-                radiation: 'Radiation of Pain', severity: 'Severity of Pain', associatedSymptoms: 'Associated Symptoms',
-                riskFactors: 'Risk Factors', pastMedicalHistory: 'Past Medical History', medications: 'Medications',
-                familyHistory: 'Family History', vitals: 'Vital Signs', cardiovascular: 'Cardiovascular Exam',
-                respiratory: 'Respiratory Exam', ecg: 'ECG', cardiacMarkers: 'Cardiac Markers',
-                correctDiagnosis: 'Correct Diagnosis', immediateManagement: 'Immediate Management'
-            }
-        };
-        return names[lang][key] || key;
+        return key;
     };
 }
 
@@ -66,12 +44,33 @@ async function loadScenarios() {
     try {
         const response = await fetch('/api/scenarios');
         const scenarios = await response.json();
-        console.log('✅ Scenarios loaded:', scenarios);
+        console.log('✅ Scenarios loaded:', scenarios.length, 'scenarios');
+        console.log('Scenario IDs:', scenarios.map(s => s.id));
         
-        const select = document.getElementById('scenario-select');
-        select.innerHTML = scenarios.map(s => 
-            `<option value="${s.id}">${s.title} - ${s.chiefComplaint}</option>`
-        ).join('');
+        const select = document.getElementById('case-select');
+        
+        // Remove duplicates based on ID
+        const uniqueScenarios = [];
+        const seenIds = new Set();
+        
+        scenarios.forEach(s => {
+            if (!seenIds.has(s.id)) {
+                seenIds.add(s.id);
+                uniqueScenarios.push(s);
+            }
+        });
+        
+        console.log('✅ Unique scenarios:', uniqueScenarios.length);
+        
+        select.innerHTML = uniqueScenarios.map(s => {
+            // Determine case letter
+            let caseLetter = 'L';
+            if (s.id.includes('cushing')) caseLetter = 'C';
+            else if (s.id.includes('sarcoidosis')) caseLetter = 'S';
+            else if (s.id.includes('gout')) caseLetter = 'G';
+            
+            return `<option value="${s.id}">Case ${caseLetter}</option>`;
+        }).join('');
         console.log('✅ Scenarios populated in dropdown');
     } catch (error) {
         console.error('❌ Error loading scenarios:', error);
@@ -84,7 +83,7 @@ document.getElementById('start-btn').addEventListener('click', async () => {
     console.log('🔵 Start button clicked!');
     
     const studentName = document.getElementById('student-name').value.trim();
-    const scenarioId = document.getElementById('scenario-select').value;
+    const scenarioId = document.getElementById('case-select').value;
     selectedLanguage = document.getElementById('language-select').value;
     
     console.log('📝 Student name:', studentName);
@@ -141,37 +140,25 @@ document.getElementById('start-btn').addEventListener('click', async () => {
         // Display patient info
         displayPatientInfo();
         
+        // Display patient image
+        displayPatientImage();
+        
+        // Generate video with Hedra if image available
+        if (currentScenario.patientInfo.patientImage) {
+            generatePatientVideo(currentScenario.presentingComplaintFull);
+        }
+        
+        // Display investigation images
+        displayInvestigationImages();
+        
+        // Clear transcript for new session
+        document.getElementById('transcript').innerHTML = '';
+        
         console.log('🎬 Showing session screen...');
         showScreen('session-screen');
         
         // Initialize WebSocket connection
         initializeWebSocket();
-        
-        // Welcome message with voice (based on language)
-        const welcomeMsg = sessionData.welcomeMessage || (selectedLanguage === 'ar' 
-            ? `مرحباً، أنا أحمد، المريض الافتراضي الخاص بك اليوم.
-
-تم تطويري من قبل وحدة ليمينال في مركز الإعلام بجامعة النجاح الوطنية لتدريبك على مهاراتك السريرية بأمان وثقة.
-
-لا تقلق، أنا صديقك اليوم وسأساعدك على الإجابة عن أي سؤال يخطر ببالك.
-
-هيا نبدأ رحلتنا معاً بطريقة مريحة وممتعة!`
-            : `Hello, I'm Ahmed, your virtual patient today.
-
-I was developed by the Liminal Unit at the Media Center of An-Najah National University to help you practice your clinical skills safely and confidently.
-
-Don't worry, I'm your friend today and I'll help you answer any questions you have.
-
-Let's start our journey together in a comfortable and fun way!`);
-        
-        addToTranscript('avatar', welcomeMsg);
-        
-        // Speak welcome message (full version for voice - clear and energetic)
-        const voiceMsg = selectedLanguage === 'ar'
-            ? `مرحباً، أنا أحمد، المريض الافتراضي الخاص بك اليوم. تم تطويري من قبل وحدة ليمينال في مركز الإعلام بجامعة النجاح الوطنية لتدريبك على مهاراتك السريرية بأمان وثقة. لا تقلق، أنا صديقك اليوم وسأساعدك على الإجابة عن أي سؤال يخطر ببالك. هيا نبدأ رحلتنا معاً بطريقة مريحة وممتعة`
-            : `Hello, I'm Ahmed, your virtual patient today. I was developed by the Liminal Unit at the Media Center of An-Najah National University to help you practice your clinical skills safely and confidently. Don't worry, I'm your friend today and I'll help you answer any questions you have. Let's start our journey together in a comfortable and fun way`;
-        
-        speak(voiceMsg);
     } catch (error) {
         console.error('❌ ERROR starting session:', error);
         console.error('Error details:', error.message);
@@ -183,26 +170,215 @@ Let's start our journey together in a comfortable and fun way!`);
     }
 });
 
+// Display patient image
+function displayPatientImage() {
+    const patientImage = document.getElementById('patient-image');
+    const avatarPlaceholder = document.getElementById('avatar-placeholder');
+    
+    if (currentScenario && currentScenario.patientInfo && currentScenario.patientInfo.patientImage) {
+        patientImage.src = currentScenario.patientInfo.patientImage;
+        patientImage.style.display = 'block';
+        avatarPlaceholder.style.display = 'none';
+        console.log('📸 Patient image loaded:', currentScenario.patientInfo.patientImage);
+    } else {
+        patientImage.style.display = 'none';
+        avatarPlaceholder.style.display = 'flex';
+    }
+}
+
+// Generate patient video with lip sync using Hedra API
+async function generatePatientVideo(text) {
+    try {
+        let patientImage = currentScenario.patientInfo.patientImage;
+        if (!patientImage) {
+            console.log('⚠️ No patient image available for video generation');
+            return;
+        }
+
+        // Convert local path to full URL if needed
+        if (patientImage.startsWith('/')) {
+            const protocol = window.location.protocol;
+            const host = window.location.host;
+            patientImage = `${protocol}//${host}${patientImage}`;
+        }
+
+        console.log('🎬 Requesting video generation from Hedra API...');
+        console.log('📝 Text length:', text.length);
+        console.log('🖼️ Image URL:', patientImage);
+        
+        const response = await fetch('/api/generate-video', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text: text,
+                imageUrl: patientImage,
+                voiceId: 'default'
+            })
+        });
+
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+            console.error('❌ Failed to generate video:', error);
+            displayPatientImageFallback(patientImage);
+            return;
+        }
+
+        const videoData = await response.json();
+        console.log('✅ Video response received:', videoData);
+        
+        // Display video or fallback to image
+        const patientVideo = document.getElementById('patient-video');
+        const patientImage_elem = document.getElementById('patient-image');
+        const avatarPlaceholder = document.getElementById('avatar-placeholder');
+        
+        if (videoData.videoUrl) {
+            console.log('✅ Video URL available, displaying video');
+            patientVideo.src = videoData.videoUrl;
+            patientVideo.style.display = 'block';
+            patientImage_elem.style.display = 'none';
+            avatarPlaceholder.style.display = 'none';
+            
+            // Auto play
+            patientVideo.play().catch(err => console.log('⚠️ Auto-play prevented:', err));
+        } else if (videoData.status === 'fallback' || videoData.imageUrl) {
+            console.log('⚠️ Using fallback image (Hedra API unavailable)');
+            displayPatientImageFallback(videoData.imageUrl || patientImage);
+        } else {
+            console.log('⚠️ No video or image URL in response');
+            displayPatientImageFallback(patientImage);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error generating video:', error);
+        // Fallback to showing the image
+        let patientImage = currentScenario.patientInfo.patientImage;
+        if (patientImage && patientImage.startsWith('/')) {
+            const protocol = window.location.protocol;
+            const host = window.location.host;
+            patientImage = `${protocol}//${host}${patientImage}`;
+        }
+        displayPatientImageFallback(patientImage);
+    }
+}
+
+function displayPatientImageFallback(imageUrl) {
+    const patientVideo = document.getElementById('patient-video');
+    const patientImage_elem = document.getElementById('patient-image');
+    const avatarPlaceholder = document.getElementById('avatar-placeholder');
+    
+    if (imageUrl) {
+        patientImage_elem.src = imageUrl;
+        patientImage_elem.style.display = 'block';
+        patientVideo.style.display = 'none';
+        avatarPlaceholder.style.display = 'none';
+        console.log('✅ Displaying patient image');
+    } else {
+        avatarPlaceholder.style.display = 'block';
+        patientVideo.style.display = 'none';
+        patientImage_elem.style.display = 'none';
+        console.log('✅ Displaying avatar placeholder');
+    }
+}
+
 // Display patient information
 function displayPatientInfo() {
     const patient = currentScenario.patientInfo;
-    const t = translations[selectedLanguage];
+    const t = translations['ar']; // Always use Arabic for patient info
     
+    // Clear previous data
+    document.getElementById('patient-info').innerHTML = '';
+    document.getElementById('chief-complaint').innerHTML = '';
+    
+    // Translate name to Arabic - check translations first
+    let patientNameArabic = '';
+    if (t.patientNames && t.patientNames[patient.name]) {
+        patientNameArabic = `السيد ${t.patientNames[patient.name]}`;
+    } else {
+        const gender = patient.gender;
+        const prefix = gender === 'male' ? 'السيد' : 'السيدة';
+        patientNameArabic = `${prefix} ${patient.name}`;
+    }
+    
+    // Translate gender
     const genderText = patient.gender === 'male' ? t.male : t.female;
-    const ageText = selectedLanguage === 'ar' ? `${patient.age} ${t.years}` : `${patient.age} ${t.years}`;
     
-    document.getElementById('patient-info').innerHTML = `
-        <p><strong>${t.name}</strong> ${selectedLanguage === 'ar' ? patient.name : 'Ahmad Mohammad'}</p>
-        <p><strong>${t.age}</strong> ${ageText}</p>
+    // Translate occupation
+    const occupationText = t.occupations[patient.occupation] || patient.occupation;
+    
+    // Build patient info HTML - all in Arabic
+    let patientHTML = `
+        <p><strong>${t.name}</strong> ${patientNameArabic}</p>
+        <p><strong>${t.age}</strong> ${patient.age} ${t.years}</p>
         <p><strong>${t.gender}</strong> ${genderText}</p>
-        <p><strong>${t.occupation}</strong> ${selectedLanguage === 'ar' ? patient.occupation : 'Employee'}</p>
+        <p><strong>${t.occupation}</strong> ${occupationText}</p>
     `;
     
-    const complaintText = selectedLanguage === 'ar' 
-        ? currentScenario.chiefComplaint
-        : 'Chest pain for two hours';
+    document.getElementById('patient-info').innerHTML = patientHTML;
     
-    document.getElementById('chief-complaint').innerHTML = `<p>${complaintText}</p>`;
+    // Get chief complaint - use Arabic translation if available
+    let complaintText = '';
+    
+    // Try to get Arabic translation first
+    if (currentScenario.arabicTranslations && 
+        currentScenario.arabicTranslations.presentingComplaint && 
+        currentScenario.arabicTranslations.presentingComplaint.full) {
+        complaintText = currentScenario.arabicTranslations.presentingComplaint.full;
+    } else {
+        // Fallback to English
+        complaintText = currentScenario.presentingComplaintFull 
+            || currentScenario.presentingComplaintShort 
+            || 'Chief Complaint';
+    }
+    
+    const complaintHTML = `
+        <p>${complaintText}</p>
+    `;
+    
+    document.getElementById('chief-complaint').innerHTML = complaintHTML;
+}
+
+// Display investigation images
+function displayInvestigationImages() {
+    const imagesContainer = document.getElementById('investigation-images');
+    
+    // Clear previous images
+    imagesContainer.innerHTML = '';
+    
+    if (!currentScenario.investigationImages || Object.keys(currentScenario.investigationImages).length === 0) {
+        return;
+    }
+    
+    let imagesData = [];
+    
+    Object.values(currentScenario.investigationImages).forEach(image => {
+        let imagePath = image.imagePath;
+        if (!imagePath.startsWith('/data')) {
+            if (imagePath.startsWith('/')) {
+                imagePath = '/data' + imagePath;
+            } else {
+                imagePath = '/data/' + imagePath;
+            }
+        }
+        imagesData.push({ path: imagePath, title: image.title });
+    });
+    
+    let imagesHTML = `
+        <button id="toggle-images-btn" class="btn-toggle-images" onclick="toggleInvestigationImages()">
+            📸 عرض الصور الطبية
+        </button>
+        <div id="images-content" class="images-content hidden">
+    `;
+    
+    imagesData.forEach(img => {
+        imagesHTML += `
+            <div class="investigation-image-item">
+                <img src="${img.path}" alt="${img.title}" style="display: block; width: 100%; max-width: 400px; border-radius: 8px;" />
+            </div>
+        `;
+    });
+    
+    imagesHTML += '</div>';
+    imagesContainer.innerHTML = imagesHTML;
 }
 
 // Speech Recognition Setup
@@ -279,61 +455,37 @@ function speak(text) {
         // Set language and voice parameters based on selected language
         if (selectedLanguage === 'ar') {
             utterance.lang = 'ar-SA';
-            utterance.rate = 1.6; // أسرع بكثير!
-            utterance.pitch = 1.0; // طبقة صوت طبيعية
-            utterance.volume = 1.0; // صوت واضح
+            utterance.rate = 1.4; // أسرع قليلاً
+            utterance.volume = 1.0; // صوت واضح جداً
+            utterance.pitch = 1.0;
         } else {
             utterance.lang = 'en-US';
-            utterance.rate = 1.5; // Much faster!
-            utterance.pitch = 1.0; // Natural pitch
+            utterance.rate = 1.4;
             utterance.volume = 1.0;
+            utterance.pitch = 1.0;
         }
         
-        // Try to find best voice for selected language
         const voices = speechSynthesis.getVoices();
-        
         let selectedVoice = null;
         
         if (selectedLanguage === 'ar') {
-            // Priority order for Arabic voices - try different dialects
-            const preferredVoices = [
-                'Majed', // Saudi
-                'Maged', // Egyptian
-                'Microsoft Naayf', // Saudi
-                'Tarik', // Saudi
-                'Google العربية',
-                'Microsoft Hoda', // Egyptian female
-                'Laila' // Egyptian
-            ];
+            // Use the DEFAULT Arabic voice (Microsoft Naayf)
+            selectedVoice = voices.find(voice => voice.default && voice.lang.startsWith('ar'));
             
-            for (const preferred of preferredVoices) {
-                selectedVoice = voices.find(voice => 
-                    voice.name.includes(preferred)
-                );
-                if (selectedVoice) {
-                    console.log('🔊 Found preferred voice:', selectedVoice.name);
-                    break;
-                }
+            if (!selectedVoice) {
+                selectedVoice = voices.find(voice => voice.lang === 'ar-SA');
             }
             
-            // Fallback to any Arabic voice
-            if (!selectedVoice) {
-                selectedVoice = voices.find(voice => voice.lang.startsWith('ar'));
-            }
-            
-            // If still no voice, try ar-EG (Egyptian)
-            if (!selectedVoice) {
-                utterance.lang = 'ar-EG';
-                selectedVoice = voices.find(voice => voice.lang.startsWith('ar-EG'));
+            if (selectedVoice) {
+                console.log('✅ Using Arabic voice:', selectedVoice.name);
             }
         } else {
-            // Priority order for English voices
+            // English voices
             const preferredVoices = [
-                'Google US English Male',
+                'Google US English',
                 'Microsoft David',
-                'Alex',
-                'Daniel',
-                'Google US English'
+                'Microsoft Mark',
+                'Microsoft Zira'
             ];
             
             for (const preferred of preferredVoices) {
@@ -343,7 +495,6 @@ function speak(text) {
                 if (selectedVoice) break;
             }
             
-            // Fallback to any English voice
             if (!selectedVoice) {
                 selectedVoice = voices.find(voice => voice.lang.startsWith('en-US'));
             }
@@ -351,18 +502,15 @@ function speak(text) {
         
         if (selectedVoice) {
             utterance.voice = selectedVoice;
-            console.log('🔊 Using voice:', selectedVoice.name, '| Rate:', utterance.rate);
-        } else {
-            console.log('⚠️ No specific voice found, using default');
+            console.log('🔊 Speaking | Voice:', selectedVoice.name, '| Rate:', utterance.rate, '| Volume:', utterance.volume);
         }
         
         utterance.onstart = () => {
-            console.log('🔊 Speaking:', text.substring(0, 50) + '...');
+            console.log('🔊 Started speaking');
         };
         
         utterance.onerror = (event) => {
-            console.error('Speech error:', event);
-            // Hide sound wave on error
+            console.error('❌ Speech error:', event.error);
             if (soundWave) {
                 soundWave.classList.remove('active');
             }
@@ -370,7 +518,6 @@ function speak(text) {
         
         utterance.onend = () => {
             console.log('✅ Speech completed');
-            // Hide sound wave when done
             if (soundWave) {
                 soundWave.classList.remove('active');
             }
@@ -384,18 +531,28 @@ function speak(text) {
 function listAvailableVoices() {
     const voices = speechSynthesis.getVoices();
     console.log('📢 Available voices:');
+    console.log('Total voices:', voices.length);
     voices.forEach((voice, index) => {
-        if (voice.lang.startsWith('ar') || voice.lang.startsWith('en')) {
-            console.log(`${index}: ${voice.name} (${voice.lang})`);
-        }
+        console.log(`${index}: ${voice.name} (${voice.lang}) - ${voice.default ? 'DEFAULT' : ''}`);
     });
 }
 
 // Load voices when available
 if ('speechSynthesis' in window) {
     speechSynthesis.onvoiceschanged = () => {
-        speechSynthesis.getVoices();
-        listAvailableVoices(); // Show available voices in console
+        const voices = speechSynthesis.getVoices();
+        console.log('🎤 ALL VOICES LOADED! Total:', voices.length);
+        console.log('='.repeat(60));
+        
+        voices.forEach((v, i) => {
+            console.log(`${i}: ${v.name} (${v.lang}) ${v.default ? '⭐ DEFAULT' : ''}`);
+        });
+        
+        console.log('='.repeat(60));
+        console.log('📢 Arabic voices:');
+        voices.filter(v => v.lang.startsWith('ar')).forEach(v => {
+            console.log(`  ✓ ${v.name} (${v.lang}) ${v.default ? '⭐ DEFAULT' : ''}`);
+        });
     };
 }
 
@@ -465,17 +622,32 @@ document.getElementById('end-btn').addEventListener('click', async () => {
 
 async function endSession() {
     try {
-        // Get evaluation
-        const response = await fetch(`/api/evaluation/${currentSession.sessionId}`);
-        const evaluation = await response.json();
+        // Stop speech synthesis immediately
+        if ('speechSynthesis' in window) {
+            speechSynthesis.cancel();
+            console.log('🔇 Speech stopped');
+        }
+        
+        // Stop microphone recording
+        if (isRecording && recognition) {
+            recognition.stop();
+            isRecording = false;
+            const micBtn = document.getElementById('mic-btn');
+            micBtn.classList.remove('active');
+            console.log('🎤 Microphone stopped');
+        }
         
         // Disconnect WebSocket
         if (socket) {
             socket.disconnect();
         }
         
-        // Display results
-        displayResults(evaluation);
+        // Show end session message
+        const messageAr = 'شكراً لك على المشاركة في هذه الجلسة التدريبية';
+        const messageEn = 'Thank you for participating in this training session';
+        const message = selectedLanguage === 'ar' ? messageAr : messageEn;
+        
+        document.getElementById('results-content').innerHTML = `<p>${message}</p>`;
         showScreen('results-screen');
     } catch (error) {
         console.error('Error ending session:', error);
@@ -486,53 +658,27 @@ async function endSession() {
     }
 }
 
-// Display results
-function displayResults(evaluation) {
-    const resultsContent = document.getElementById('results-content');
-    const score = evaluation.score;
-    const t = translations[selectedLanguage];
-    
-    let html = `
-        <div class="score-display">
-            <h3>${score.percentage}%</h3>
-            <p>${score.earnedPoints} ${t.from} ${score.totalPoints} ${t.points}</p>
-        </div>
-    `;
-    
-    // Display checklist
-    const checklist = evaluation.evaluationChecklist;
-    
-    for (const [category, items] of Object.entries(checklist)) {
-        html += `<div class="checklist-category">`;
-        html += `<h4>${getCategoryName(category, selectedLanguage)}</h4>`;
-        
-        for (const [key, item] of Object.entries(items)) {
-            const className = item.asked ? 'completed' : 'missed';
-            const status = item.asked ? '✓' : '✗';
-            html += `
-                <div class="checklist-item ${className}">
-                    <span>${status} ${getItemName(key, selectedLanguage)}</span>
-                    <span>${item.points} ${t.points}</span>
-                </div>
-            `;
-        }
-        
-        html += `</div>`;
-    }
-    
-    resultsContent.innerHTML = html;
-}
-
 function getCategoryName(category, lang) {
-    return translations[lang][category] || category;
+    return category;
 }
 
 function getItemName(key, lang) {
-    return translations[lang][key] || key;
+    return key;
 }
 
 // New session
 document.getElementById('new-session-btn').addEventListener('click', () => {
+    // Stop speech synthesis
+    if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+    }
+    
+    // Stop microphone recording
+    if (isRecording && recognition) {
+        recognition.stop();
+        isRecording = false;
+    }
+    
     currentSession = null;
     currentScenario = null;
     showScreen('setup-screen');
@@ -546,6 +692,29 @@ function initializeWebSocket() {
     
     socket.on('connect', () => {
         console.log('✅ WebSocket connected:', socket.id);
+        
+        // Send welcome message to transcript after connection
+        if (currentSession && currentScenario) {
+            const t = translations['ar'];
+            let patientNameArabic = '';
+            if (t.patientNames && t.patientNames[currentScenario.patientInfo.name]) {
+                patientNameArabic = t.patientNames[currentScenario.patientInfo.name];
+            } else {
+                patientNameArabic = currentScenario.patientInfo.name;
+            }
+            
+            const patientGender = currentScenario.patientInfo.gender;
+            const patientLabel = patientGender === 'male' ? 'المريض' : 'المريضة';
+            
+            const welcomeMsg = `مرحباً، أنا ${patientNameArabic}، ${patientLabel} الافتراضي الخاص بك اليوم.
+
+تم تطويري من قبل وحدة ليمينال في مركز الإعلام بجامعة النجاح الوطنية لتدريبك على مهاراتك السريرية بأمان وثقة.
+
+هيا نبدأ رحلتنا معاً بطريقة مريحة وممتعة!`;
+            
+            addToTranscript('avatar', welcomeMsg);
+            speak(welcomeMsg);
+        }
     });
     
     socket.on('chat-response', (data) => {
@@ -554,12 +723,13 @@ function initializeWebSocket() {
         // Add agent response to transcript
         if (data.response) {
             addToTranscript('avatar', data.response);
+            
+            // Generate video for the response
+            if (currentScenario && currentScenario.patientInfo && currentScenario.patientInfo.patientImage) {
+                generatePatientVideo(data.response);
+            }
+            
             speak(data.response);
-        }
-        
-        // Update score display (optional)
-        if (data.score) {
-            console.log('📊 Current score:', data.score);
         }
     });
     
@@ -619,12 +789,56 @@ function addToTranscript(role, message) {
     const item = document.createElement('div');
     item.className = `transcript-item ${role}`;
     
-    const t = translations[selectedLanguage];
-    const label = role === 'student' ? t.you : role === 'avatar' ? t.patient : t.system;
-    item.innerHTML = `<strong>${label}:</strong> ${message}`;
+    const t = translations['ar']; // Always use Arabic
+    
+    let label = '';
+    if (role === 'student') {
+        label = t.you;
+    } else if (role === 'avatar') {
+        // Use "المريض" or "المريضة" based on gender
+        const patientGender = currentScenario?.patientInfo?.gender;
+        label = patientGender === 'male' ? 'المريض' : 'المريضة';
+    } else {
+        label = t.system;
+    }
+    
+    // Replace patient name in message with Arabic version
+    let displayMessage = message;
+    if (currentScenario?.patientInfo?.name) {
+        const englishName = currentScenario.patientInfo.name;
+        let arabicName = '';
+        
+        // Check if name exists in translations
+        if (t.patientNames && t.patientNames[englishName]) {
+            arabicName = t.patientNames[englishName];
+        } else {
+            // Generate Arabic name based on gender
+            const gender = currentScenario.patientInfo.gender;
+            const prefix = gender === 'male' ? 'السيد' : 'السيدة';
+            arabicName = `${prefix} ${englishName}`;
+        }
+        
+        displayMessage = message.replace(new RegExp(englishName, 'g'), arabicName);
+    }
+    
+    item.innerHTML = `<strong>${label}:</strong> ${displayMessage}`;
     
     transcript.appendChild(item);
     transcript.scrollTop = transcript.scrollHeight;
+}
+
+// Toggle investigation images visibility
+function toggleInvestigationImages() {
+    const content = document.getElementById('images-content');
+    const btn = document.getElementById('toggle-images-btn');
+    
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        btn.textContent = '📸 إخفاء الصور الطبية';
+    } else {
+        content.classList.add('hidden');
+        btn.textContent = '📸 عرض الصور الطبية';
+    }
 }
 
 // Initialize

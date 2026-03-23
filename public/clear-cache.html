@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Cache</title>
+</head>
+<body>
+    <h1>جاري فضي الكاش...</h1>
+    <p>Clearing cache...</p>
+    
+    <script>
+        // Clear all caches
+        if ('caches' in window) {
+            caches.keys().then(cacheNames => {
+                cacheNames.forEach(cacheName => {
+                    caches.delete(cacheName);
+                    console.log('Deleted cache:', cacheName);
+                });
+            });
+        }
+        
+        // Clear localStorage
+        localStorage.clear();
+        console.log('Cleared localStorage');
+        
+        // Clear sessionStorage
+        sessionStorage.clear();
+        console.log('Cleared sessionStorage');
+        
+        // Redirect to main page
+        setTimeout(() => {
+            window.location.href = '/index.html';
+        }, 1000);
+    </script>
+</body>
+</html>

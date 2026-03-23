@@ -1,0 +1,395 @@
+{
+  "id": "scenario_sle_001",
+  "title": "Systemic Lupus Erythematosus (SLE) - Joint Pain and Fatigue",
+  "difficulty": "advanced",
+  "examType": "OSCE",
+  "department": "Internal Medicine Clinic / Emergency Department",
+  "patientInfo": {
+    "name": "Sarah Ahmed",
+    "age": 23,
+    "gender": "female",
+    "occupation": "Graphic designer",
+    "maritalStatus": "Married",
+    "patientImage": "/data/imge/avatar-case-l.png"
+  },
+  "presentingComplaintShort": "bilateral hand pain",
+  "presentingComplaintFull": "I've been feeling very tired for the past few months, and my hands have been hurting.",
+  "historyOfPresentingComplaint": {
+    "fatigue": {
+      "duration": "3 months",
+      "progression": "progressive",
+      "englishTerms": ["fatigue", "tiredness", "exhaustion", "weakness"]
+    },
+    "jointPain": {
+      "location": "Small joints (hands and wrists)",
+      "pattern": "Bilateral and symmetrical",
+      "swelling": "present",
+      "redness": "present",
+      "morningStiffness": "lasting more than 1 hour",
+      "deformities": "No deformities",
+      "englishTerms": ["joint pain", "arthralgia", "arthritis", "hand pain", "wrist pain", "bilateral", "symmetrical", "swelling", "redness", "morning stiffness"]
+    },
+    "facialRash": {
+      "description": "Malar rash",
+      "trigger": "Appears after sun exposure",
+      "location": "Across cheeks and nose",
+      "characteristics": "Not itchy",
+      "englishTerms": ["rash", "malar rash", "facial rash", "sun exposure", "photosensitivity", "cheeks", "nose"]
+    },
+    "oralUlcers": {
+      "frequency": "Recurrent",
+      "painfulness": "Painless",
+      "englishTerms": ["oral ulcers", "mouth ulcers", "ulcers", "recurrent ulcers", "painless ulcers"]
+    },
+    "hairLoss": {
+      "present": true,
+      "englishTerms": ["hair loss", "alopecia"]
+    },
+    "fever": {
+      "type": "Low-grade fever",
+      "englishTerms": ["fever", "temperature", "low-grade fever"]
+    },
+    "legSwelling": {
+      "description": "Recent bilateral leg swelling",
+      "englishTerms": ["leg swelling", "edema", "bilateral swelling", "lower limb swelling"]
+    }
+  },
+  "systematicReview": {
+    "photosensitivity": {
+      "answer": "Yes",
+      "englishTerms": ["photosensitivity", "sun sensitivity", "light sensitivity"]
+    },
+    "raynaudsPhenomenon": {
+      "answer": "Sometimes fingers turn pale in cold",
+      "englishTerms": ["Raynaud's phenomenon", "Raynaud phenomenon", "pale fingers", "cold exposure"]
+    },
+    "chestPain": {
+      "answer": "Mild pleuritic pain 2 weeks ago",
+      "englishTerms": ["chest pain", "pleuritic pain", "pleurisy", "chest discomfort"]
+    },
+    "respiratorySymptoms": {
+      "shortness_of_breath": "No",
+      "cough": "No",
+      "englishTerms": ["shortness of breath", "dyspnea", "SOB", "cough", "respiratory symptoms"]
+    },
+    "urineChanges": {
+      "description": "Frothy urine, no hematuria, no dysuria",
+      "englishTerms": ["urine changes", "frothy urine", "proteinuria", "hematuria", "dysuria", "urinary symptoms"]
+    },
+    "neurologicalSymptoms": {
+      "seizures": "No",
+      "psychosis": "No",
+      "englishTerms": ["seizures", "psychosis", "neurological symptoms", "CNS involvement"]
+    },
+    "miscarriages": {
+      "history": "One miscarriage at 10 weeks",
+      "englishTerms": ["miscarriage", "pregnancy loss", "obstetric history", "antiphospholipid"]
+    }
+  },
+  "pastMedicalHistory": {
+    "chronicIllness": "No known chronic illness",
+    "englishTerms": ["past medical history", "PMH", "chronic illness", "previous illness"]
+  },
+  "drugHistory": {
+    "medications": "Occasional ibuprofen",
+    "englishTerms": ["drug history", "medications", "ibuprofen", "NSAIDs", "pain relief"]
+  },
+  "allergies": {
+    "drugAllergies": "No known drug allergies",
+    "englishTerms": ["allergies", "drug allergies", "NKDA", "no known allergies"]
+  },
+  "socialHistory": {
+    "occupation": "Graphic designer",
+    "maritalStatus": "Married",
+    "smoking": "Non-smoker",
+    "recreationalDrugs": "No recreational drug use",
+    "englishTerms": ["social history", "occupation", "smoking", "alcohol", "recreational drugs", "lifestyle"]
+  },
+  "familyHistory": {
+    "rheumatologicalDisease": "Aunt has a rheumatological disease",
+    "englishTerms": ["family history", "aunt", "rheumatological disease", "autoimmune disease", "genetic predisposition"]
+  },
+  "differentialDiagnosis": {
+    "mostLikely": "Systemic Lupus Erythematosus (SLE)",
+    "alternatives": [
+      "Rheumatoid arthritis",
+      "Seronegative inflammatory arthritis",
+      "Fibromyalgia",
+      "Osteoarthritis"
+    ],
+    "englishTerms": ["differential diagnosis", "SLE", "systemic lupus erythematosus", "rheumatoid arthritis", "RA", "inflammatory arthritis", "fibromyalgia", "osteoarthritis"]
+  },
+  "investigations": {
+    "initialLabs": {
+      "CBC": "Complete Blood Count",
+      "ESR": "Erythrocyte Sedimentation Rate",
+      "CRP": "C-Reactive Protein",
+      "ANA": "Antinuclear Antibody",
+      "antiDsDNA": "Anti-double stranded DNA",
+      "antiSmith": "Anti-Smith antibodies",
+      "RF": "Rheumatoid factor",
+      "complement": "Complement levels (C3, C4)",
+      "englishTerms": ["CBC", "ESR", "CRP", "ANA", "anti-dsDNA", "anti-Smith", "rheumatoid factor", "RF", "complement", "C3", "C4", "blood tests", "serology"]
+    },
+    "renalAssessment": {
+      "urinalysis": "Urinalysis",
+      "proteinCreatinineRatio": "Urine protein/creatinine ratio",
+      "serumCreatinine": "Serum creatinine",
+      "kidneyBiopsy": "Kidney biopsy",
+      "englishTerms": ["renal assessment", "urinalysis", "urine protein", "creatinine", "kidney function", "kidney biopsy", "renal involvement"]
+    }
+  },
+  "investigationResults": {
+    "bloodTests": [
+      {
+        "test": "Hemoglobin",
+        "result": "10.2 g/dL",
+        "normalRange": "12–16",
+        "englishTerms": ["hemoglobin", "Hb", "anemia"]
+      },
+      {
+        "test": "WBC (White Blood Cells)",
+        "result": "3.2 ×10⁹/L",
+        "normalRange": "4–11",
+        "englishTerms": ["WBC", "white blood cells", "leukocytes", "leukopenia"]
+      },
+      {
+        "test": "Platelets",
+        "result": "110 ×10⁹/L",
+        "normalRange": "150–400",
+        "englishTerms": ["platelets", "thrombocytes", "thrombocytopenia"]
+      },
+      {
+        "test": "Creatinine",
+        "result": "1.9 mg/dL",
+        "normalRange": "0.6–1.1",
+        "englishTerms": ["creatinine", "renal function", "kidney function"]
+      },
+      {
+        "test": "Urea",
+        "result": "60 mg/dL",
+        "normalRange": "15–40",
+        "englishTerms": ["urea", "BUN", "blood urea nitrogen"]
+      },
+      {
+        "test": "C3",
+        "result": "Low",
+        "normalRange": "Normal",
+        "englishTerms": ["C3", "complement C3", "complement levels"]
+      },
+      {
+        "test": "C4",
+        "result": "Low",
+        "normalRange": "Normal",
+        "englishTerms": ["C4", "complement C4", "complement levels"]
+      },
+      {
+        "test": "ANA",
+        "result": "Positive",
+        "normalRange": "Negative",
+        "englishTerms": ["ANA", "antinuclear antibody", "positive ANA"]
+      },
+      {
+        "test": "Anti-dsDNA",
+        "result": "1:320",
+        "normalRange": "Negative",
+        "englishTerms": ["anti-dsDNA", "anti-double stranded DNA", "dsDNA antibodies"]
+      }
+    ],
+    "urinalysis": [
+      {
+        "test": "Protein",
+        "result": "+++",
+        "englishTerms": ["protein", "proteinuria", "protein in urine"]
+      },
+      {
+        "test": "Blood",
+        "result": "++",
+        "englishTerms": ["blood", "hematuria", "blood in urine"]
+      },
+      {
+        "test": "RBCs",
+        "result": "20–30 /HPF",
+        "englishTerms": ["RBCs", "red blood cells", "hematuria"]
+      },
+      {
+        "test": "RBC casts",
+        "result": "Present",
+        "englishTerms": ["RBC casts", "casts", "cellular casts"]
+      }
+    ],
+    "proteinCreatinineRatio": {
+      "result": "2.8 g/g",
+      "englishTerms": ["protein/creatinine ratio", "proteinuria", "nephrotic range"]
+    }
+  },
+  "diagnosis": {
+    "mostLikely": "Systemic Lupus Erythematosus with Lupus Nephritis",
+    "englishTerms": ["SLE", "systemic lupus erythematosus", "lupus nephritis", "lupus", "diagnosis"]
+  },
+  "sleClassificationCriteria": {
+    "criteria": [
+      {
+        "name": "Malar rash",
+        "present": true,
+        "englishTerms": ["malar rash", "butterfly rash", "facial rash"]
+      },
+      {
+        "name": "Photosensitivity",
+        "present": true,
+        "englishTerms": ["photosensitivity", "sun sensitivity"]
+      },
+      {
+        "name": "Oral ulcers",
+        "present": true,
+        "englishTerms": ["oral ulcers", "mouth ulcers"]
+      },
+      {
+        "name": "Arthritis",
+        "present": true,
+        "englishTerms": ["arthritis", "joint involvement"]
+      },
+      {
+        "name": "Renal involvement",
+        "present": true,
+        "englishTerms": ["renal involvement", "lupus nephritis", "kidney involvement"]
+      },
+      {
+        "name": "Hematologic involvement",
+        "present": true,
+        "englishTerms": ["hematologic involvement", "cytopenias", "anemia", "leukopenia", "thrombocytopenia"]
+      },
+      {
+        "name": "Immunologic markers",
+        "present": true,
+        "details": "anti-dsDNA, anti-Smith positive",
+        "englishTerms": ["immunologic markers", "anti-dsDNA", "anti-Smith", "antibodies"]
+      },
+      {
+        "name": "Positive ANA",
+        "present": true,
+        "englishTerms": ["ANA", "antinuclear antibody", "positive ANA"]
+      }
+    ]
+  },
+  "management": {
+    "general": [
+      "Rheumatology referral",
+      "Sun protection",
+      "Avoid UV exposure"
+    ],
+    "medications": [
+      {
+        "drug": "Hydroxychloroquine",
+        "indication": "Baseline treatment for all SLE patients",
+        "englishTerms": ["hydroxychloroquine", "plaquenil", "antimalarial"]
+      },
+      {
+        "drug": "Corticosteroids",
+        "indication": "Depending on severity",
+        "englishTerms": ["corticosteroids", "steroids", "prednisolone", "prednisone"]
+      },
+      {
+        "drug": "Immunosuppressive therapy",
+        "indication": "e.g., mycophenolate for nephritis",
+        "englishTerms": ["immunosuppressive therapy", "mycophenolate", "MMF", "cyclophosphamide", "azathioprine"]
+      }
+    ],
+    "renalProtection": [
+      {
+        "intervention": "ACE inhibitor",
+        "indication": "For proteinuria control",
+        "englishTerms": ["ACE inhibitor", "ACE-I", "lisinopril", "enalapril", "proteinuria control"]
+      }
+    ],
+    "monitoring": [
+      {
+        "parameter": "Renal function",
+        "englishTerms": ["renal function", "creatinine", "kidney function"]
+      },
+      {
+        "parameter": "Complement levels",
+        "englishTerms": ["complement levels", "C3", "C4"]
+      },
+      {
+        "parameter": "Anti-dsDNA titers",
+        "englishTerms": ["anti-dsDNA titers", "dsDNA antibodies", "disease activity"]
+      }
+    ]
+  },
+  "avatarPersonality": {
+    "responseStyle": "Tired, concerned about symptoms, cooperative with questions, expresses pain and fatigue naturally",
+    "temperature": 0.3,
+    "maxTokens": 150
+  },
+  "arabicTranslations": {
+    "patientInfo": {
+      "name": "سارة أحمد",
+      "age": "23 سنة",
+      "occupation": "مصممة جرافيك",
+      "maritalStatus": "متزوجة"
+    },
+    "presentingComplaint": {
+      "short": "ألم في اليدين بشكل ثنائي",
+      "full": "أشعر بتعب شديد منذ عدة أشهر، كما أن يديّ تؤلمانني."
+    },
+    "historyOfPresentingComplaint": {
+      "jointPain": {
+        "location": "يصيب المفاصل الصغيرة (مفاصل اليدين والرسغين)",
+        "pattern": "ثنائي الجانب ومتناظر",
+        "swelling": "يوجد تورم واحمرار",
+        "morningStiffness": "تيبس صباحي يستمر لأكثر من ساعة",
+        "deformities": "لا توجد تشوهات مفصلية"
+      },
+      "facialRash": {
+        "description": "طفح جلدي على الوجه (Butterfly Rash)",
+        "details": "طفح أحمر أو بنفسجي يمتد عبر جسر الأنف والخدين",
+        "trigger": "يظهر بعد التعرض لأشعة الشمس",
+        "characteristics": "غير مصحوب بحكة"
+      },
+      "oralUlcers": {
+        "frequency": "متكررة",
+        "painfulness": "غير مؤلمة"
+      },
+      "hairLoss": "تساقط الشعر",
+      "fever": "حمى خفيفة الدرجة",
+      "legSwelling": "تورم حديث في الساقين بشكل ثنائي"
+    },
+    "systematicReview": {
+      "photosensitivity": "نعم - حساسية للضوء",
+      "raynaudsPhenomenon": "أحيانًا تصبح الأصابع شاحبة عند التعرض للبرد",
+      "chestPain": "ألم صدري خفيف يزداد مع التنفس (pleuritic pain) حدث قبل أسبوعين",
+      "respiratorySymptoms": "لا يوجد ضيق تنفس أو سعال",
+      "urineChanges": {
+        "frothy": "بول رغوي",
+        "hematuria": "لا يوجد دم في البول",
+        "dysuria": "لا يوجد عسر تبول"
+      },
+      "neurologicalSymptoms": {
+        "seizures": "لا توجد نوبات صرع",
+        "psychosis": "لا يوجد ذهان"
+      },
+      "miscarriages": "حدث إجهاض واحد عند عمر حملي 10 أسابيع"
+    },
+    "pastMedicalHistory": "لا يوجد أمراض مزمنة معروفة",
+    "drugHistory": "تتناول إيبوبروفين (Ibuprofen) أحيانًا لتسكين الألم",
+    "allergies": "لا توجد حساسية معروفة للأدوية",
+    "socialHistory": {
+      "occupation": "تعمل مصممة جرافيك",
+      "maritalStatus": "متزوجة",
+      "smoking": "غير مدخنة"
+    },
+    "familyHistory": "توجد مرض روماتيزمي لدى إحدى العمّات",
+    "diagnosis": "الذئبة الحمراء الجهازية (SLE) مع التهاب الكلى الذئبي",
+    "sleClassificationCriteria": [
+      "طفح حمراوي على الخدين (Malar Rash / Butterfly Rash)",
+      "حساسية من الشمس (Photosensitivity)",
+      "قرح في الفم (Oral Ulcers)",
+      "التهاب المفاصل (Arthritis)",
+      "تأثر الكلى (Renal Involvement)",
+      "تأثر الدم - فقر دم، نقص الكريات البيضاء، نقص الصفيحات (Hematologic Involvement)",
+      "علامات مناعية - أجسام مضادة للحمض النووي المزدوج، أجسام مضادة للسميث (Immunologic Markers)",
+      "أجسام مضادة نووية إيجابية (Positive ANA)"
+    ]
+  }
+}

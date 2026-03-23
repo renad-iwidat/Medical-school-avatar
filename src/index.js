@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { ScenarioManager } from './scenario-manager.js';
 import { SessionManager } from './session-manager.js';
 import { MedicalAvatarAgent } from './agent.js';
+import { HedraService } from './hedra-service.js';
 
 dotenv.config();
 
@@ -19,10 +20,20 @@ const io = new Server(httpServer, {
 
 app.use(express.json());
 app.use(express.static('public'));
+app.use('/data', express.static('data'));
+
+// Add cache-busting headers
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
 
 const scenarioManager = new ScenarioManager();
 const sessionManager = new SessionManager();
 const agent = new MedicalAvatarAgent();
+const hedraService = new HedraService();
 
 // Get available scenarios
 app.get('/api/scenarios', (req, res) => {
@@ -71,11 +82,53 @@ app.post('/api/session/start', async (req, res) => {
 
 // Get session evaluation
 app.get('/api/evaluation/:sessionId', (req, res) => {
-  const evaluation = sessionManager.getEvaluation(req.params.sessionId);
-  if (!evaluation) {
-    return res.status(404).json({ error: 'Session not found' });
+  res.json({ success: true });
+});
+
+// Generate video with Hedra API
+app.post('/api/generate-video', async (req, res) => {
+  try {
+    const { text, imageUrl, voiceId } = req.body;
+    
+    if (!text || !imageUrl) {
+      return res.status(400).json({ error: 'Missing text or imageUrl' });
+    }
+
+    console.log('🎬 Generating video with Hedra...');
+    console.log('📝 Text:', text.substring(0, 50) + '...');
+    console.log('🖼️ Image URL:', imageUrl);
+    console.log('🔑 Hedra API Key configured:', !!process.env.HEDRA_API_KEY);
+    
+    const videoData = await hedraService.generateVideoWithLipSync(text, imageUrl, voiceId);
+    
+    if (!videoData) {
+      console.error('❌ Hedra service returned null');
+      // Return fallback response with image
+      return res.json({
+        status: 'fallback',
+        imageUrl: imageUrl,
+        message: 'Hedra API unavailable, using static image'
+      });
+    }
+
+    console.log('✅ Video data received:', videoData.status);
+    res.json(videoData);
+  } catch (error) {
+    console.error('❌ Error generating video:', error);
+    res.json({
+      status: 'fallback',
+      imageUrl: req.body.imageUrl,
+      message: 'Error generating video, using static image'
+    });
   }
-  res.json(evaluation);
+});
+
+// Check Hedra API status
+app.get('/api/hedra-status', (req, res) => {
+  res.json({ 
+    enabled: hedraService.isEnabled(),
+    message: hedraService.isEnabled() ? 'Hedra API is enabled' : 'Hedra API is not configured'
+  });
 });
 
 const PORT = process.env.PORT || 3000;
@@ -94,14 +147,9 @@ io.on('connection', (socket) => {
       // Get agent response
       const response = await agent.processQuestion(sessionId, message);
       
-      // Update evaluation
-      sessionManager.updateEvaluation(sessionId, message);
-      const score = sessionManager.calculateScore(sessionId);
-      
       // Send response back
       socket.emit('chat-response', {
-        response,
-        score
+        response
       });
       
       console.log('✅ Response sent:', response);

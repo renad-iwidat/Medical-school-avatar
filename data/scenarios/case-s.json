@@ -1,0 +1,375 @@
+{
+  "id": "scenario_sarcoidosis_001",
+  "title": "Sarcoidosis - Cough and Shortness of Breath",
+  "difficulty": "advanced",
+  "examType": "OSCE",
+  "department": "Internal Medicine Clinic",
+  "patientInfo": {
+    "name": "Mr. Khaled Mohamed",
+    "age": 41,
+    "gender": "male",
+    "occupation": "Teacher",
+    "patientImage": "/data/imge/avatar-case-s.png"
+  },
+  "presentingComplaintFull": "I have had a bad cough for the last month, all the time, and I get short of breath. I also noticed a rash on my skin and sometimes feel feverish.",
+  "presentingComplaintShort": "Cough and shortness of breath",
+  "historyOfPresentingComplaint": {
+    "cough": {
+      "onset": "Sudden, 1 month ago",
+      "character": "Dry",
+      "severity": "7/10",
+      "progression": "Worsening",
+      "aggravatingFactor": "Exercise",
+      "relievingFactor": "Sometimes inhalers",
+      "recentTravelOrInfections": "No",
+      "smoking": "Non-smoker",
+      "englishTerms": ["cough", "dry cough", "onset", "severity", "progression", "worsening", "exercise", "inhalers"]
+    },
+    "associatedSymptoms": {
+      "exertionalShortness": "Exertional shortness of breath",
+      "skinRash": "Skin rash (erythema nodosum)",
+      "fever": "Fever (documented 38 °C)",
+      "constipation": "Constipation",
+      "englishTerms": ["shortness of breath", "dyspnea", "exertional", "rash", "erythema nodosum", "fever", "constipation"]
+    },
+    "previousEpisodes": {
+      "upperRespiratoryInfections": "Occasional upper respiratory infections, resolved in 1 week",
+      "coughSyrup": "Cough syrup did not help",
+      "englishTerms": ["upper respiratory infections", "URI", "previous episodes", "resolved"]
+    }
+  },
+  "systematicReview": {
+    "general": {
+      "fatigue": "Present",
+      "lowGradeFever": "Present",
+      "weightLoss": "No",
+      "englishTerms": ["fatigue", "fever", "low-grade fever", "weight loss"]
+    },
+    "cardiovascular": {
+      "hypertension": "Known hypertension",
+      "englishTerms": ["hypertension", "high blood pressure", "cardiovascular"]
+    },
+    "respiratory": {
+      "dryCough": "Dry cough",
+      "chestPain": "No",
+      "englishTerms": ["dry cough", "cough", "chest pain", "respiratory symptoms"]
+    },
+    "gastrointestinal": {
+      "constipation": "Constipation",
+      "abdominalPain": "No",
+      "urinarySymptoms": "No",
+      "englishTerms": ["constipation", "abdominal pain", "gastrointestinal symptoms", "urinary symptoms"]
+    },
+    "skin": {
+      "rash": "Rash on legs (erythema nodosum)",
+      "englishTerms": ["rash", "erythema nodosum", "skin findings", "legs"]
+    },
+    "neurological": {
+      "symptoms": "No neurological symptoms",
+      "englishTerms": ["neurological symptoms", "headaches", "seizures"]
+    }
+  },
+  "pastMedicalHistory": {
+    "chronicIllnesses": "No chronic illnesses",
+    "englishTerms": ["past medical history", "PMH", "chronic illness", "chronic diseases"]
+  },
+  "drugHistory": {
+    "medications": "None",
+    "englishTerms": ["drug history", "medications", "drugs"]
+  },
+  "allergies": {
+    "drugAllergies": "No known drug allergies",
+    "englishTerms": ["allergies", "drug allergies", "NKDA", "no known allergies"]
+  },
+  "vaccinationHistory": {
+    "status": "Not sure",
+    "englishTerms": ["vaccination history", "vaccines"]
+  },
+  "socialHistory": {
+    "weight": "Overweight",
+    "smoking": "No smoking",
+    "alcohol": "No alcohol",
+    "recreationalDrugs": "No recreational drugs",
+    "diet": "Occasional red meat, sugary beverages",
+    "englishTerms": ["social history", "overweight", "smoking", "alcohol", "drug use", "diet", "lifestyle"]
+  },
+  "familyHistory": {
+    "endocrineDisease": "No known endocrine disease",
+    "respiratoryDisease": "No known respiratory disease",
+    "englishTerms": ["family history", "endocrine disease", "respiratory disease", "genetic predisposition"]
+  },
+  "examinationFindings": {
+    "temperature": "38 °C",
+    "bloodPressure": "136/78 mmHg",
+    "heartRate": "105 bpm",
+    "chestExamination": {
+      "chestExpansion": "Decreased bilateral",
+      "breathingSounds": "Decreased bilateral with fine end inspiratory crackles mainly lower fields",
+      "englishTerms": ["chest expansion", "breathing sounds", "crackles", "end inspiratory", "lower fields"]
+    }
+  },
+  "differentialDiagnosis": {
+    "options": [
+      "Interstitial lung disease (ILD)",
+      "Atypical infection (TB, viral, fungal)",
+      "Sarcoidosis",
+      "Foreign body aspiration"
+    ],
+    "englishTerms": ["differential diagnosis", "ILD", "interstitial lung disease", "TB", "tuberculosis", "viral", "fungal", "sarcoidosis", "foreign body aspiration"]
+  },
+  "investigations": {
+    "initialTests": {
+      "tests": [
+        "CBC",
+        "CRP",
+        "Chest X-ray",
+        "ABG",
+        "Serum calcium and vitamin D"
+      ],
+      "englishTerms": ["CBC", "complete blood count", "CRP", "C-reactive protein", "chest X-ray", "ABG", "arterial blood gas", "serum calcium", "vitamin D"]
+    },
+    "advancedImaging": {
+      "test": "Chest CT",
+      "englishTerms": ["chest CT", "CT scan", "computed tomography"]
+    }
+  },
+  "chestXrayFindings": {
+    "findings": [
+      "Bilateral hilar lymphadenopathy",
+      "Scattered reticular infiltrates"
+    ],
+    "diagnosis": "Spot diagnosis: Sarcoidosis",
+    "englishTerms": ["bilateral hilar lymphadenopathy", "hilar", "lymphadenopathy", "reticular infiltrates", "infiltrates", "chest X-ray findings"]
+  },
+  "definitiveDignosisSarcoidosis": {
+    "test": "Lung Biopsy",
+    "englishTerms": ["lung biopsy", "biopsy", "definitive diagnosis"]
+  },
+  "otherFindingsInSarcoidosis": {
+    "physicalExam": [
+      "High calcium and vitamin D",
+      "Arthralgia",
+      "Neck swelling",
+      "Uveitis",
+      "Splenomegaly"
+    ],
+    "englishTerms": ["hypercalcemia", "high calcium", "vitamin D", "arthralgia", "joint pain", "neck swelling", "uveitis", "splenomegaly", "spleen enlargement"]
+  },
+  "treatment": {
+    "corticosteroids": "Corticosteroids in severe cases (CNS involvement, uveitis, hypercalcemia)",
+    "symptomatic": "Symptomatic management for mild disease",
+    "englishTerms": ["corticosteroids", "steroids", "treatment", "CNS involvement", "uveitis", "hypercalcemia", "symptomatic management"]
+  },
+  "possibleComplications": {
+    "pulmonary": [
+      "Fibrosis",
+      "Reduced lung function",
+      "Pulmonary hypertension",
+      "Bronchiectasis",
+      "Infections"
+    ],
+    "cardiac": [
+      "Arrhythmias",
+      "Heart failure",
+      "Sudden death"
+    ],
+    "ocular": [
+      "Uveitis → glaucoma",
+      "Cataracts",
+      "Blindness"
+    ],
+    "neurological": [
+      "Cranial nerve palsy",
+      "Seizures",
+      "Neuropathy"
+    ],
+    "renalMetabolic": [
+      "Hypercalcemia",
+      "Kidney stones",
+      "Renal failure"
+    ],
+    "skinJoints": [
+      "Erythema nodosum",
+      "Arthralgia"
+    ],
+    "englishTerms": ["complications", "fibrosis", "lung function", "pulmonary hypertension", "bronchiectasis", "infections", "arrhythmias", "heart failure", "sudden death", "uveitis", "glaucoma", "cataracts", "blindness", "cranial nerve palsy", "seizures", "neuropathy", "hypercalcemia", "kidney stones", "renal failure", "erythema nodosum", "arthralgia"]
+  },
+  "diagnosis": {
+    "mostLikely": "Sarcoidosis",
+    "englishTerms": ["sarcoidosis", "diagnosis"]
+  },
+  "investigationImages": {
+    "erythemaNodosum": {
+      "title": "Erythema Nodosum (الحمامي العقدية)",
+      "description": "طفح جلدي أحمر على الساقين - علامة جلدية شائعة في الساركويدوسيس",
+      "imagePath": "/data/imge/img2-s.png",
+      "englishTerms": ["erythema nodosum", "rash", "skin findings", "legs"]
+    },
+    "ctScan": {
+      "title": "Chest CT Scan (تصوير مقطعي للصدر)",
+      "description": "تصوير مقطعي يوضح التسللات الشبكية والتضخم اللمفاوي الهيلي بشكل أفضل",
+      "imagePath": "/data/imge/img3-s.png",
+      "englishTerms": ["chest CT", "CT scan", "bilateral hilar lymphadenopathy", "reticular infiltrates"]
+    }
+  },
+  "avatarPersonality": {
+    "responseStyle": "Concerned about persistent cough, worried about shortness of breath, cooperative with questions, expresses fatigue and fever naturally",
+    "temperature": 0.3,
+    "maxTokens": 150
+  },
+  "arabicTranslations": {
+    "title": "الساركويدوسيس - السعال وضيق التنفس",
+    "patientInfo": {
+      "name": "السيد خالد محمد",
+      "age": "41 سنة",
+      "gender": "ذكر",
+      "occupation": "معلم"
+    },
+    "presentingComplaint": {
+      "short": "السعال وضيق التنفس",
+      "full": "كان لدي سعال سيء طوال الشهر الماضي، طوال الوقت، وأشعر بضيق في التنفس. لاحظت أيضاً طفح جلدي وأشعر أحياناً بحمى."
+    },
+    "historyOfPresentingComplaint": {
+      "cough": {
+        "onset": "فجائي، منذ شهر واحد",
+        "character": "جاف",
+        "severity": "7/10",
+        "progression": "متفاقم",
+        "aggravatingFactor": "التمرين",
+        "relievingFactor": "أحياناً الموسعات",
+        "recentTravelOrInfections": "لا",
+        "smoking": "غير مدخن"
+      },
+      "associatedSymptoms": {
+        "exertionalShortness": "ضيق تنفس عند المجهود",
+        "skinRash": "طفح جلدي (الحمامي العقدية)",
+        "fever": "حمى (موثقة 38°م)",
+        "constipation": "إمساك"
+      },
+      "previousEpisodes": {
+        "upperRespiratoryInfections": "عدوى تنفسية عليا عرضية، تحسنت في أسبوع واحد",
+        "coughSyrup": "شراب السعال لم يساعد"
+      }
+    },
+    "systematicReview": {
+      "general": {
+        "fatigue": "موجود",
+        "lowGradeFever": "موجود",
+        "weightLoss": "لا"
+      },
+      "cardiovascular": {
+        "hypertension": "ارتفاع ضغط دم معروف"
+      },
+      "respiratory": {
+        "dryCough": "سعال جاف",
+        "chestPain": "لا"
+      },
+      "gastrointestinal": {
+        "constipation": "إمساك",
+        "abdominalPain": "لا",
+        "urinarySymptoms": "لا"
+      },
+      "skin": {
+        "rash": "طفح على الساقين (الحمامي العقدية)"
+      },
+      "neurological": {
+        "symptoms": "لا توجد أعراض عصبية"
+      }
+    },
+    "pastMedicalHistory": "لا توجد أمراض مزمنة",
+    "drugHistory": "لا يوجد",
+    "allergies": "لا توجد حساسية دوائية معروفة",
+    "vaccinationHistory": "غير متأكد",
+    "socialHistory": {
+      "weight": "زيادة وزن",
+      "smoking": "لا يدخن",
+      "alcohol": "لا يشرب الكحول",
+      "recreationalDrugs": "لا يستخدم مخدرات",
+      "diet": "لحم أحمر عرضي، مشروبات سكرية"
+    },
+    "familyHistory": {
+      "endocrineDisease": "لا يوجد تاريخ عائلي لأمراض الغدد الصماء",
+      "respiratoryDisease": "لا يوجد تاريخ عائلي لأمراض تنفسية"
+    },
+    "examinationFindings": {
+      "temperature": "38°م",
+      "bloodPressure": "136/78 ملم زئبق",
+      "heartRate": "105 نبضة/دقيقة",
+      "chestExamination": {
+        "chestExpansion": "تمدد صدري مقلل ثنائي الجانب",
+        "breathingSounds": "أصوات تنفس مقللة ثنائية الجانب مع خراخر نهاية الشهيق الدقيقة بشكل أساسي في الحقول السفلية"
+      }
+    },
+    "differentialDiagnosis": [
+      "مرض الرئة الخلالي",
+      "عدوى غير نمطية (السل، فيروسية، فطرية)",
+      "الساركويدوسيس",
+      "استنشاق جسم غريب"
+    ],
+    "investigations": {
+      "initialTests": [
+        "تعداد الدم الكامل",
+        "البروتين التفاعلي",
+        "صورة الصدر",
+        "غاز الدم الشرياني",
+        "الكالسيوم والفيتامين د في الدم"
+      ],
+      "advancedImaging": "التصوير المقطعي للصدر"
+    },
+    "chestXrayFindings": {
+      "findings": [
+        "تضخم لمفاوي هيلي ثنائي الجانب",
+        "تسللات شبكية متناثرة"
+      ],
+      "diagnosis": "التشخيص الفوري: الساركويدوسيس"
+    },
+    "definitiveDignosisSarcoidosis": "خزعة الرئة",
+    "otherFindingsInSarcoidosis": {
+      "physicalExam": [
+        "كالسيوم وفيتامين د مرتفع",
+        "ألم المفاصل",
+        "تورم الرقبة",
+        "التهاب العنبية",
+        "تضخم الطحال"
+      ]
+    },
+    "treatment": {
+      "corticosteroids": "الكورتيكوستيرويدات في الحالات الشديدة (تأثر الجهاز العصبي المركزي، التهاب العنبية، فرط الكالسيوم)",
+      "symptomatic": "الإدارة العرضية للمرض الخفيف"
+    },
+    "possibleComplications": {
+      "pulmonary": [
+        "التليف",
+        "تقليل وظائف الرئة",
+        "ارتفاع ضغط الدم الرئوي",
+        "التوسع القصبي",
+        "العدوى"
+      ],
+      "cardiac": [
+        "عدم انتظام ضربات القلب",
+        "قصور القلب",
+        "الموت المفاجئ"
+      ],
+      "ocular": [
+        "التهاب العنبية → الجلوكوما",
+        "إعتام العدسة",
+        "العمى"
+      ],
+      "neurological": [
+        "شلل الأعصاب القحفية",
+        "النوبات",
+        "الاعتلال العصبي"
+      ],
+      "renalMetabolic": [
+        "فرط الكالسيوم",
+        "حصى الكلى",
+        "قصور كلوي"
+      ],
+      "skinJoints": [
+        "الحمامي العقدية",
+        "ألم المفاصل"
+      ]
+    },
+    "diagnosis": "الساركويدوسيس"
+  }
+}

@@ -1,0 +1,381 @@
+{
+  "id": "scenario_cushing_001",
+  "title": "Cushing Syndrome - Fracture and Weight Gain",
+  "difficulty": "advanced",
+  "examType": "OSCE",
+  "department": "Internal Medicine Clinic",
+  "patientInfo": {
+    "name": "Ms. Sara Ahmad",
+    "age": 37,
+    "gender": "female",
+    "occupation": "Housewife",
+    "patientImage": "/data/imge/avatar-case-c.png"
+  },
+  "referralReason": "Right radius/ulnar fracture after minor trauma",
+  "presentingComplaintFull": "I broke my arm after a simple fall last week, and the doctor said the fracture shouldn't have happened from such a small injury. I've also gained a lot of weight over the last two years.",
+  "presentingComplaintShort": "Right radius/ulnar fracture and weight gain",
+  "historyOfPresentingComplaint": {
+    "fracture": {
+      "onset": "1 week ago",
+      "mechanism": "Minor trauma (simple fall at home)",
+      "severity": "Pain was moderate",
+      "previousFractures": "No previous history",
+      "delayedHealing": "No",
+      "englishTerms": ["fracture", "radius", "ulnar", "trauma", "fall", "bone fracture", "pathological fracture", "minor trauma"]
+    },
+    "weightGain": {
+      "onset": "Gradual over 2 years",
+      "amount": "About 10 kg",
+      "distribution": "Mainly around the abdomen",
+      "dietChange": "No significant change",
+      "physicalActivity": "Same as usual",
+      "englishTerms": ["weight gain", "obesity", "central obesity", "abdominal weight gain", "weight increase"]
+    },
+    "fatigue": {
+      "duration": "1–2 years",
+      "englishTerms": ["fatigue", "tiredness", "weakness", "exhaustion"]
+    },
+    "muscleWeakness": {
+      "description": "Difficulty climbing stairs (proximal muscle weakness)",
+      "englishTerms": ["muscle weakness", "proximal weakness", "difficulty climbing stairs", "myopathy"]
+    },
+    "acne": {
+      "recent": true,
+      "englishTerms": ["acne", "skin lesions"]
+    },
+    "negativeSymptoms": {
+      "easyBruising": "No",
+      "purpleStriae": "No",
+      "hirsutism": "No",
+      "irregularMenstruation": "No",
+      "voiceDeepening": "No",
+      "englishTerms": ["easy bruising", "bruising", "purple striae", "striae", "hirsutism", "irregular menstruation", "menstrual irregularities", "voice changes"]
+    }
+  },
+  "systematicReview": {
+    "general": {
+      "fatigue": "Present",
+      "fever": "No",
+      "nightSweats": "No",
+      "englishTerms": ["fatigue", "fever", "night sweats"]
+    },
+    "cardiovascular": {
+      "hypertension": "Recently diagnosed",
+      "chestPain": "No",
+      "palpitations": "No",
+      "englishTerms": ["hypertension", "high blood pressure", "chest pain", "palpitations"]
+    },
+    "respiratory": {
+      "cough": "No",
+      "shortnessOfBreath": "No",
+      "englishTerms": ["cough", "shortness of breath", "dyspnea", "respiratory symptoms"]
+    },
+    "endocrine": {
+      "heatColdIntolerance": "No",
+      "polyuria": "No",
+      "polydipsia": "No",
+      "englishTerms": ["heat intolerance", "cold intolerance", "polyuria", "polydipsia", "endocrine symptoms"]
+    },
+    "gastrointestinal": {
+      "abdominalPain": "No",
+      "bowelHabitChange": "No",
+      "englishTerms": ["abdominal pain", "bowel habits", "gastrointestinal symptoms"]
+    },
+    "neurological": {
+      "headaches": "No",
+      "visualDisturbances": "No",
+      "englishTerms": ["headaches", "visual disturbances", "neurological symptoms"]
+    },
+    "psychiatric": {
+      "irritability": "Mild",
+      "depression": "No",
+      "englishTerms": ["irritability", "depression", "mood changes", "psychiatric symptoms"]
+    }
+  },
+  "pastMedicalHistory": {
+    "hypertension": "Newly diagnosed (a few months ago)",
+    "diabetes": "No",
+    "thyroidDisease": "No",
+    "previousFractures": "No",
+    "englishTerms": ["past medical history", "PMH", "hypertension", "diabetes", "thyroid disease", "fracture history"]
+  },
+  "drugHistory": {
+    "medications": "Amlodipine for hypertension",
+    "steroidUse": "No steroid use (oral, inhaled, topical, injections)",
+    "englishTerms": ["drug history", "medications", "amlodipine", "steroid use", "oral steroids", "inhaled steroids", "topical steroids", "injections"]
+  },
+  "allergies": {
+    "drugAllergies": "No known drug allergies",
+    "englishTerms": ["allergies", "drug allergies", "NKDA", "no known allergies"]
+  },
+  "vaccinationHistory": {
+    "status": "Not sure",
+    "englishTerms": ["vaccination history", "vaccines"]
+  },
+  "socialHistory": {
+    "occupation": "Housewife",
+    "smoking": "Non-smoker",
+    "alcohol": "No alcohol use",
+    "drugs": "No drug use",
+    "englishTerms": ["social history", "occupation", "smoking", "alcohol", "drug use", "lifestyle"]
+  },
+  "familyHistory": {
+    "endocrineDisease": "No family history of endocrine disease",
+    "osteoporosis": "No family history of osteoporosis",
+    "englishTerms": ["family history", "endocrine disease", "osteoporosis", "genetic predisposition"]
+  },
+  "examinationFindings": {
+    "bloodPressure": "150/85 mmHg",
+    "heartRate": "75 bpm",
+    "generalAppearance": {
+      "centralObesity": "Present",
+      "moonFace": "Possible",
+      "acne": "Mild",
+      "proximalMuscleWeakness": "Present",
+      "englishTerms": ["central obesity", "moon face", "acne", "proximal muscle weakness", "appearance", "physical examination"]
+    }
+  },
+  "differentialDiagnosis": {
+    "mostLikely": "Cushing Syndrome",
+    "englishTerms": ["differential diagnosis", "Cushing syndrome", "Cushing's syndrome", "hypercortisolism"]
+  },
+  "causeOfBonyProblem": {
+    "explanation": "Osteopenia or osteoporosis due to high levels of steroids",
+    "englishTerms": ["osteopenia", "osteoporosis", "bone loss", "steroid-induced", "pathological fracture"]
+  },
+  "diagnosticTests": {
+    "confirmHypercortisolism": {
+      "tests": [
+        "24-hour urinary free cortisol",
+        "Late-night salivary cortisol",
+        "Low-dose dexamethasone suppression test"
+      ],
+      "englishTerms": ["24-hour urinary free cortisol", "urinary cortisol", "salivary cortisol", "late-night salivary cortisol", "dexamethasone suppression test", "low-dose dexamethasone", "hypercortisolism", "cortisol levels"]
+    },
+    "boneAssessment": {
+      "test": "DEXA scan to evaluate osteoporosis",
+      "englishTerms": ["DEXA scan", "bone density", "osteoporosis screening", "bone mineral density"]
+    }
+  },
+  "nextStepAfterHighCortisol": {
+    "measureACTH": {
+      "highACTH": "Suggests an ACTH-dependent cause → Proceed to high-dose dexamethasone suppression test → Pituitary MRI if indicated",
+      "lowACTH": "Suggests an adrenal cause → CT scan of the adrenal glands",
+      "englishTerms": ["ACTH", "adrenocorticotropic hormone", "ACTH-dependent", "ACTH-independent", "high-dose dexamethasone", "pituitary MRI", "adrenal CT", "adrenal glands"]
+    }
+  },
+  "additionalBloodTests": {
+    "tests": [
+      "HbA1c (screen for diabetes)",
+      "Fasting glucose",
+      "Lipid profile",
+      "Serum electrolytes (may show hypokalemia)",
+      "ABG (may show metabolic alkalosis)"
+    ],
+    "englishTerms": ["HbA1c", "hemoglobin A1c", "fasting glucose", "blood glucose", "lipid profile", "serum electrolytes", "hypokalemia", "potassium", "ABG", "arterial blood gas", "metabolic alkalosis", "blood tests"]
+  },
+  "diagnosis": {
+    "mostLikely": "Cushing Syndrome",
+    "englishTerms": ["Cushing syndrome", "Cushing's syndrome", "hypercortisolism", "diagnosis"]
+  },
+  "cushingSyndromeFeatures": {
+    "features": [
+      {
+        "name": "Central obesity",
+        "present": true,
+        "englishTerms": ["central obesity", "abdominal obesity", "weight gain"]
+      },
+      {
+        "name": "Moon face",
+        "present": true,
+        "englishTerms": ["moon face", "facial appearance", "facial rounding"]
+      },
+      {
+        "name": "Proximal muscle weakness",
+        "present": true,
+        "englishTerms": ["proximal muscle weakness", "myopathy", "muscle weakness"]
+      },
+      {
+        "name": "Hypertension",
+        "present": true,
+        "englishTerms": ["hypertension", "high blood pressure"]
+      },
+      {
+        "name": "Osteoporosis/pathological fracture",
+        "present": true,
+        "englishTerms": ["osteoporosis", "osteopenia", "pathological fracture", "bone loss"]
+      },
+      {
+        "name": "Acne",
+        "present": true,
+        "englishTerms": ["acne", "skin lesions"]
+      },
+      {
+        "name": "Fatigue",
+        "present": true,
+        "englishTerms": ["fatigue", "tiredness", "weakness"]
+      },
+      {
+        "name": "Mild irritability",
+        "present": true,
+        "englishTerms": ["irritability", "mood changes", "psychiatric symptoms"]
+      }
+    ]
+  },
+  "avatarPersonality": {
+    "responseStyle": "Concerned about fracture, worried about weight gain, cooperative with questions, expresses fatigue and weakness naturally",
+    "temperature": 0.3,
+    "maxTokens": 150
+  },
+  "investigationImages": {
+    "striae": {
+      "title": "Purple Striae (خطوط أرجوانية)",
+      "description": "علامة من علامات Cushing Syndrome - خطوط أرجوانية على الجلد",
+      "imagePath": "/data/imge/img1-c.png",
+      "englishTerms": ["purple striae", "striae", "stretch marks", "skin findings"]
+    }
+  },
+  "arabicTranslations": {
+    "avatarDescription": {
+      "moonFace": "وجه مستدير جداً وأحمر وممتلئ",
+      "buffaloHump": "كتلة دهنية بين الكتفين أو في قاعدة الرقبة"
+    },
+    "patientInfo": {
+      "name": "سارة أحمد",
+      "age": "37 سنة",
+      "occupation": "ربة منزل",
+      "gender": "أنثى"
+    },
+    "presentingComplaint": {
+      "short": "كسر في نصف القطر والزند الأيمن وزيادة الوزن",
+      "full": "كسرت ذراعي بعد سقوط بسيط الأسبوع الماضي، وقال الطبيب إن الكسر لا يفترض أن يحدث بسبب إصابة بسيطة كهذه. كما أنني ازددت وزناً كثيراً خلال السنتين الماضيتين."
+    },
+    "historyOfPresentingComplaint": {
+      "fracture": {
+        "onset": "منذ أسبوع واحد",
+        "mechanism": "رض بسيط – سقوط بسيط في المنزل",
+        "severity": "ألم متوسط",
+        "previousFractures": "لا يوجد تاريخ سابق لكسور",
+        "delayedHealing": "لا"
+      },
+      "weightGain": {
+        "onset": "تدريجية خلال سنتين",
+        "amount": "حوالي 10 كغ",
+        "distribution": "بشكل أساسي حول البطن (سمنة مركزية – Central obesity)",
+        "dietChange": "لا يوجد تغير ملحوظ",
+        "physicalActivity": "كما هو معتاد"
+      },
+      "associatedSymptoms": {
+        "fatigue": "إرهاق عام منذ 1–2 سنة",
+        "muscleWeakness": "صعوبة في صعود الدرج بسبب ضعف العضلات القريبة (Proximal muscle weakness)",
+        "acne": "ظهور حب الشباب مؤخراً"
+      },
+      "negativeSymptoms": {
+        "easyBruising": "لا يوجد سهولة حدوث الكدمات",
+        "purpleStriae": "لا يوجد علامات تمدد بنفسجية على الجلد",
+        "hirsutism": "لا يوجد زيادة الشعر عند النساء",
+        "irregularMenstruation": "لا يوجد عدم انتظام الدورة الشهرية",
+        "voiceDeepening": "لا يوجد خشونة أو تعمق الصوت"
+      }
+    },
+    "systematicReview": {
+      "general": {
+        "fatigue": "يوجد إرهاق",
+        "fever": "لا يوجد حمى",
+        "nightSweats": "لا يوجد تعرق ليلي"
+      },
+      "cardiovascular": {
+        "hypertension": "ارتفاع ضغط دم تم تشخيصه حديثاً",
+        "chestPain": "لا يوجد ألم صدري",
+        "palpitations": "لا يوجد خفقان"
+      },
+      "respiratory": {
+        "cough": "لا يوجد سعال",
+        "shortnessOfBreath": "لا يوجد ضيق في التنفس"
+      },
+      "endocrine": {
+        "heatColdIntolerance": "لا يوجد عدم تحمل للحرارة أو البرودة",
+        "polyuria": "لا يوجد كثرة التبول",
+        "polydipsia": "لا يوجد العطش الشديد"
+      },
+      "gastrointestinal": {
+        "abdominalPain": "لا يوجد ألم بطني",
+        "bowelHabitChange": "لا يوجد تغير في عادات التبرز"
+      },
+      "neurological": {
+        "headaches": "لا يوجد صداع",
+        "visualDisturbances": "لا يوجد اضطرابات في الرؤية"
+      },
+      "psychiatric": {
+        "irritability": "تهيج بسيط",
+        "depression": "لا يوجد اكتئاب"
+      }
+    },
+    "pastMedicalHistory": {
+      "hypertension": "ارتفاع ضغط الدم المشخص حديثاً (منذ عدة أشهر)",
+      "diabetes": "لا يوجد داء سكري",
+      "thyroidDisease": "لا يوجد مرض في الغدة الدرقية",
+      "previousFractures": "لا يوجد كسور سابقة"
+    },
+    "drugHistory": {
+      "medications": "أملوديبين (Amlodipine) لعلاج ارتفاع ضغط الدم",
+      "steroidUse": "لا يوجد استعمال للكورتيكوستيرويدات"
+    },
+    "allergies": "لا توجد حساسية دوائية معروفة",
+    "vaccinationHistory": "غير متأكدة",
+    "socialHistory": {
+      "occupation": "ربة منزل",
+      "smoking": "غير مدخنة",
+      "alcohol": "لا تتناول الكحول",
+      "drugs": "لا تستخدم المخدرات"
+    },
+    "familyHistory": {
+      "endocrineDisease": "لا يوجد تاريخ عائلي لأمراض الغدد الصماء",
+      "osteoporosis": "لا يوجد تاريخ عائلي لهشاشة العظام"
+    },
+    "examinationFindings": {
+      "bloodPressure": "150/85 ملم زئبق",
+      "heartRate": "75 نبضة/دقيقة",
+      "generalAppearance": {
+        "centralObesity": "موجودة",
+        "moonFace": "محتملة - وجه مستدير جداً وأحمر وممتلئ",
+        "buffaloHump": "كتلة دهنية بين الكتفين",
+        "acne": "خفيفة",
+        "proximalMuscleWeakness": "موجودة"
+      }
+    },
+    "diagnosis": "متلازمة كوشينج",
+    "causeOfBonyProblem": "هشاشة العظام أو نقص تكلس العظام بسبب مستويات عالية من الستيرويدات",
+    "diagnosticTests": {
+      "confirmHypercortisolism": [
+        "قياس الكورتيزول الحر في البول على مدار 24 ساعة",
+        "قياس الكورتيزول في اللعاب في وقت متأخر من الليل",
+        "اختبار قمع الديكساميثازون بجرعة منخفضة"
+      ],
+      "boneAssessment": "فحص DEXA لتقييم هشاشة العظام"
+    },
+    "nextStepAfterHighCortisol": {
+      "measureACTH": "قياس مستوى ACTH",
+      "highACTH": "يشير إلى سبب يعتمد على ACTH → الانتقال إلى اختبار قمع الديكساميثازون بجرعة عالية → التصوير بالرنين المغناطيسي للغدة النخامية إذا لزم الأمر",
+      "lowACTH": "يشير إلى سبب كظري → التصوير المقطعي للغدد الكظرية"
+    },
+    "additionalBloodTests": [
+      "HbA1c (للفحص عن السكري)",
+      "الجلوكوز الصائم",
+      "ملف الدهون",
+      "الشوارد في الدم (قد تظهر نقص البوتاسيوم)",
+      "غاز الدم الشرياني (قد يظهر قلاء استقلابي)"
+    ],
+    "cushingSyndromeFeatures": [
+      "السمنة المركزية",
+      "وجه القمر (Moon Face)",
+      "كتلة دهنية بين الكتفين (Buffalo Hump)",
+      "ضعف العضلات القريبة",
+      "ارتفاع ضغط الدم",
+      "هشاشة العظام/كسر مرضي",
+      "حب الشباب",
+      "الإرهاق",
+      "التهيج الخفيف"
+    ]
+  }
+}

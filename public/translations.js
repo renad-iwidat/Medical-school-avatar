@@ -21,9 +21,6 @@ const translations = {
         micActive: '🎤 نشط',
         messagePlaceholder: 'اكتب سؤالك هنا...',
         send: 'إرسال',
-        results: 'نتائج التقييم',
-        points: 'نقطة',
-        from: 'من',
         newSession: 'جلسة جديدة',
         you: 'أنت',
         patient: 'المريض',
@@ -35,30 +32,27 @@ const translations = {
         male: 'ذكر',
         female: 'أنثى',
         years: 'سنة',
-        // Evaluation categories
-        history: 'القصة المرضية',
-        examination: 'الفحص السريري',
-        investigations: 'الفحوصات',
-        diagnosis: 'التشخيص',
-        management: 'الخطة العلاجية',
-        // Evaluation items
-        chiefComplaintItem: 'الشكوى الرئيسية',
-        onset: 'بداية الأعراض',
-        character: 'طبيعة الألم',
-        radiation: 'انتشار الألم',
-        severity: 'شدة الألم',
-        associatedSymptoms: 'الأعراض المصاحبة',
-        riskFactors: 'عوامل الخطورة',
-        pastMedicalHistory: 'السوابق المرضية',
-        medications: 'الأدوية',
-        familyHistory: 'التاريخ العائلي',
-        vitals: 'العلامات الحيوية',
-        cardiovascular: 'فحص القلب',
-        respiratory: 'فحص الجهاز التنفسي',
-        ecg: 'تخطيط القلب',
-        cardiacMarkers: 'إنزيمات القلب',
-        correctDiagnosis: 'التشخيص الصحيح',
-        immediateManagement: 'الإسعافات الأولية'
+        // Occupations translations
+        occupations: {
+            'Office employee': 'موظف مكتب',
+            'Teacher': 'معلم',
+            'Housewife': 'ربة منزل',
+            'Graphic designer': 'مصمم جرافيك'
+        },
+        // Patient names translations to Arabic
+        patientNames: {
+            'Ms. Sara Ahmad': 'سارة أحمد',
+            'Mr. Khaled Mohamed': 'خالد محمد',
+            'Mr. Ahmad Khalil': 'أحمد خليل',
+            'Sarah Ahmed': 'سارة أحمد'
+        },
+        // Chief complaints translations - short version with Arabic meaning
+        chiefComplaints: {
+            'Right radius/ulnar fracture and weight gain': 'كسر في الكعبرة والزند وزيادة الوزن - Right radius/ulnar fracture and weight gain',
+            'Cough and shortness of breath': 'سعال وضيق في التنفس - Cough and shortness of breath',
+            'Severe right knee pain': 'ألم شديد في الركبة اليمنى - Severe right knee pain',
+            'bilateral hand pain': 'ألم ثنائي في اليدين - bilateral hand pain'
+        }
     },
     en: {
         title: 'Interactive Medical Avatar',
@@ -81,9 +75,6 @@ const translations = {
         micActive: '🎤 Active',
         messagePlaceholder: 'Type your question here...',
         send: 'Send',
-        results: 'Evaluation Results',
-        points: 'points',
-        from: 'out of',
         newSession: 'New Session',
         you: 'You',
         patient: 'Patient',
@@ -95,41 +86,36 @@ const translations = {
         male: 'Male',
         female: 'Female',
         years: 'years old',
-        // Evaluation categories
-        history: 'History Taking',
-        examination: 'Physical Examination',
-        investigations: 'Investigations',
-        diagnosis: 'Diagnosis',
-        management: 'Management Plan',
-        // Evaluation items
-        chiefComplaintItem: 'Chief Complaint',
-        onset: 'Onset of Symptoms',
-        character: 'Character of Pain',
-        radiation: 'Radiation of Pain',
-        severity: 'Severity of Pain',
-        associatedSymptoms: 'Associated Symptoms',
-        riskFactors: 'Risk Factors',
-        pastMedicalHistory: 'Past Medical History',
-        medications: 'Medications',
-        familyHistory: 'Family History',
-        vitals: 'Vital Signs',
-        cardiovascular: 'Cardiovascular Exam',
-        respiratory: 'Respiratory Exam',
-        ecg: 'ECG',
-        cardiacMarkers: 'Cardiac Markers',
-        correctDiagnosis: 'Correct Diagnosis',
-        immediateManagement: 'Immediate Management'
+        // Occupations translations
+        occupations: {
+            'Office employee': 'Office employee',
+            'Teacher': 'Teacher',
+            'Housewife': 'Housewife',
+            'Graphic designer': 'Graphic designer'
+        },
+        // Patient names translations
+        patientNames: {
+            'Ms. Sara Ahmad': 'Ms. Sara Ahmad',
+            'Mr. Khaled Mohamed': 'Mr. Khaled Mohamed',
+            'Mr. Ahmad Khalil': 'Mr. Ahmad Khalil',
+            'Sarah Ahmed': 'Sarah Ahmed'
+        },
+        // Chief complaints translations - short version with Arabic meaning
+        chiefComplaints: {
+            'Right radius/ulnar fracture and weight gain': 'Right radius/ulnar fracture and weight gain',
+            'Cough and shortness of breath': 'Cough and shortness of breath',
+            'Severe right knee pain': 'Severe right knee pain',
+            'bilateral hand pain': 'bilateral hand pain'
+        }
     }
 };
 
 function getCategoryName(category, lang) {
-    const t = translations[lang];
-    return t[category] || category;
+    return category;
 }
 
 function getItemName(key, lang) {
-    const t = translations[lang];
-    return t[key] || key;
+    return key;
 }
 
 function updateUILanguage(lang) {
@@ -176,10 +162,8 @@ function updateUILanguage(lang) {
     if (messageInput) messageInput.placeholder = t.messagePlaceholder;
     
     // Update results screen - check if exists
-    const resultsTitle = document.querySelector('#results-screen h2');
     const newSessionBtn = document.getElementById('new-session-btn');
     
-    if (resultsTitle) resultsTitle.textContent = t.results;
     if (newSessionBtn) newSessionBtn.textContent = t.newSession;
     
     // Update status - check if exists
