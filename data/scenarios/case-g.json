@@ -9,7 +9,8 @@
     "age": 48,
     "gender": "male",
     "occupation": "Office employee",
-    "patientImage": "/data/imge/avatar-case-g.png"
+    "patientImage": "/data/imge/avatar-case-g.png",
+    "patientVideo": "/data/videos/video-case-g.mp4"
   },
   "presentingComplaintFull": "My right knee started hurting suddenly last night. The pain was so bad it woke me up at 2 AM. I couldn't even tolerate the weight of the bed sheet on it.",
   "presentingComplaintShort": "Severe right knee pain",

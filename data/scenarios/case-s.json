@@ -9,7 +9,8 @@
     "age": 41,
     "gender": "male",
     "occupation": "Teacher",
-    "patientImage": "/data/imge/avatar-case-s.png"
+    "patientImage": "/data/imge/avatar-case-s.png",
+    "patientVideo": "/data/videos/video-case-s.mp4"
   },
   "presentingComplaintFull": "I have had a bad cough for the last month, all the time, and I get short of breath. I also noticed a rash on my skin and sometimes feel feverish.",
   "presentingComplaintShort": "Cough and shortness of breath",

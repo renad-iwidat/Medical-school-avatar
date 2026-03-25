@@ -143,8 +143,8 @@ document.getElementById('start-btn').addEventListener('click', async () => {
         // Display patient image
         displayPatientImage();
         
-        // Generate video with Hedra if image available
-        if (currentScenario.patientInfo.patientImage) {
+        // Generate video with Hedra if image available and NO local video
+        if (currentScenario.patientInfo.patientImage && !currentScenario.patientInfo.patientVideo) {
             generatePatientVideo(currentScenario.presentingComplaintFull);
         }
         
@@ -170,19 +170,56 @@ document.getElementById('start-btn').addEventListener('click', async () => {
     }
 });
 
-// Display patient image
+// Display patient image or video
 function displayPatientImage() {
+    const patientVideo = document.getElementById('patient-video');
     const patientImage = document.getElementById('patient-image');
     const avatarPlaceholder = document.getElementById('avatar-placeholder');
     
-    if (currentScenario && currentScenario.patientInfo && currentScenario.patientInfo.patientImage) {
+    // Check if scenario has a video file
+    if (currentScenario && currentScenario.patientInfo && currentScenario.patientInfo.patientVideo) {
+        const videoPath = currentScenario.patientInfo.patientVideo;
+        patientVideo.src = videoPath;
+        patientVideo.loop = true;
+        patientVideo.muted = true;
+        patientVideo.style.display = 'block';
+        patientVideo.style.objectFit = 'contain';
+        patientImage.style.display = 'none';
+        avatarPlaceholder.style.display = 'none';
+        // Load but don't play - will play when avatar speaks
+        patientVideo.load();
+        // Show first frame (paused)
+        patientVideo.currentTime = 0;
+        console.log('🎬 Patient video loaded (paused):', videoPath);
+    } else if (currentScenario && currentScenario.patientInfo && currentScenario.patientInfo.patientImage) {
         patientImage.src = currentScenario.patientInfo.patientImage;
         patientImage.style.display = 'block';
+        patientVideo.style.display = 'none';
         avatarPlaceholder.style.display = 'none';
         console.log('📸 Patient image loaded:', currentScenario.patientInfo.patientImage);
     } else {
         patientImage.style.display = 'none';
+        patientVideo.style.display = 'none';
         avatarPlaceholder.style.display = 'flex';
+    }
+}
+
+// Start playing the avatar video (called when avatar starts speaking)
+function startAvatarVideo() {
+    const patientVideo = document.getElementById('patient-video');
+    if (patientVideo && patientVideo.src && patientVideo.style.display !== 'none') {
+        patientVideo.loop = true;
+        patientVideo.play().catch(err => console.log('⚠️ Video auto-play prevented:', err));
+        console.log('▶️ Avatar video playing');
+    }
+}
+
+// Pause the avatar video (called when avatar stops speaking)
+function pauseAvatarVideo() {
+    const patientVideo = document.getElementById('patient-video');
+    if (patientVideo && patientVideo.src && patientVideo.style.display !== 'none') {
+        patientVideo.pause();
+        console.log('⏸️ Avatar video paused');
     }
 }
 
@@ -467,6 +504,9 @@ async function speak(text) {
     const soundWave = document.getElementById('sound-wave');
     if (soundWave) soundWave.classList.add('active');
 
+    // Start avatar video when speaking begins
+    startAvatarVideo();
+
     // Try OpenAI TTS first
     if (ttsEnabled) {
         try {
@@ -488,12 +528,14 @@ async function speak(text) {
                     if (soundWave) soundWave.classList.remove('active');
                     URL.revokeObjectURL(audioUrl);
                     currentAudio = null;
+                    pauseAvatarVideo();
                     console.log('✅ OpenAI TTS completed');
                 };
                 currentAudio.onerror = () => {
                     if (soundWave) soundWave.classList.remove('active');
                     URL.revokeObjectURL(audioUrl);
                     currentAudio = null;
+                    pauseAvatarVideo();
                     console.log('⚠️ OpenAI TTS error, falling back to browser');
                     speakWithBrowser(text, soundWave);
                 };
@@ -539,8 +581,14 @@ function speakWithBrowser(text, soundWave) {
     }
     if (voice) utterance.voice = voice;
 
-    utterance.onend = () => { if (soundWave) soundWave.classList.remove('active'); };
-    utterance.onerror = () => { if (soundWave) soundWave.classList.remove('active'); };
+    utterance.onend = () => { 
+        if (soundWave) soundWave.classList.remove('active'); 
+        pauseAvatarVideo();
+    };
+    utterance.onerror = () => { 
+        if (soundWave) soundWave.classList.remove('active'); 
+        pauseAvatarVideo();
+    };
 
     speechSynthesis.speak(utterance);
 }
@@ -553,6 +601,7 @@ function stopSpeaking() {
     if ('speechSynthesis' in window) {
         speechSynthesis.cancel();
     }
+    pauseAvatarVideo();
 }
 
 
@@ -748,8 +797,8 @@ function initializeWebSocket() {
         if (data.response) {
             addToTranscript('avatar', data.response);
             
-            // Generate video for the response
-            if (currentScenario && currentScenario.patientInfo && currentScenario.patientInfo.patientImage) {
+            // Generate Hedra video only if no local video available
+            if (currentScenario && currentScenario.patientInfo && currentScenario.patientInfo.patientImage && !currentScenario.patientInfo.patientVideo) {
                 generatePatientVideo(data.response);
             }
             

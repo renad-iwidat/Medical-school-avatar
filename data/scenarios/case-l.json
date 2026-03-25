@@ -10,7 +10,8 @@
     "gender": "female",
     "occupation": "Graphic designer",
     "maritalStatus": "Married",
-    "patientImage": "/data/imge/avatar-case-l.png"
+    "patientImage": "/data/imge/avatar-case-l.png",
+    "patientVideo": "/data/videos/video-case-l.mp4"
   },
   "presentingComplaintShort": "bilateral hand pain",
   "presentingComplaintFull": "I've been feeling very tired for the past few months, and my hands have been hurting.",

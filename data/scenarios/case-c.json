@@ -9,7 +9,8 @@
     "age": 37,
     "gender": "female",
     "occupation": "Housewife",
-    "patientImage": "/data/imge/avatar-case-c.png"
+    "patientImage": "/data/imge/avatar-case-c.png",
+    "patientVideo": "/data/videos/video-case-c.mp4"
   },
   "referralReason": "Right radius/ulnar fracture after minor trauma",
   "presentingComplaintFull": "I broke my arm after a simple fall last week, and the doctor said the fracture shouldn't have happened from such a small injury. I've also gained a lot of weight over the last two years.",
