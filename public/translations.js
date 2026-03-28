@@ -16,7 +16,7 @@ const translations = {
         endSession: 'إنهاء',
         notConnected: '⚪ غير متصل',
         connected: '🟢 متصل',
-        micStopped: '🎤 اضغط الميكروفون للتحدث',
+        micStopped: '🎤 اضغط مطولاً على مسطرة الكيبورد (Space) للتحدث، ثم ارفع إصبعك لإرسال السؤال',
         micRecording: '🎤 يسجل... تكلم الآن',
         micActive: '🎤 نشط',
         messagePlaceholder: 'اكتب سؤالك هنا...',
@@ -37,14 +37,17 @@ const translations = {
             'Office employee': 'موظف مكتب',
             'Teacher': 'معلم',
             'Housewife': 'ربة منزل',
-            'Graphic designer': 'مصمم جرافيك'
+            'Graphic designer': 'مصممة جرافيك',
+            'Retired accountant': 'محاسب متقاعد'
         },
         // Patient names translations to Arabic
         patientNames: {
             'Ms. Sara Ahmad': 'سارة أحمد',
             'Mr. Khaled Mohamed': 'خالد محمد',
             'Mr. Ahmad Khalil': 'أحمد خليل',
-            'Sarah Ahmed': 'سارة أحمد'
+            'Sarah Ahmed': 'سارة أحمد',
+            'Mr. Naji': 'ناجي',
+            'Mr. Hassan': 'حسان'
         },
         // Chief complaints translations - short version with Arabic meaning
         chiefComplaints: {

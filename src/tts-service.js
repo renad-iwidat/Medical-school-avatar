@@ -39,11 +39,11 @@ export class TTSService {
         model: 'gpt-4o-mini-tts',
         voice: voice,
         input: text,
-        speed: 1.4,
+        speed: 1.5,
         response_format: 'mp3',
         instructions: gender === 'female' 
-          ? 'Speak in Arabic with a natural, warm female voice. Sound like a real patient - slightly worried and tired.'
-          : 'Speak in Arabic with a natural, clear male voice. Sound like a real patient - express pain and concern naturally.'
+          ? 'Speak in Arabic with a natural, warm female voice. Sound like a real patient.'
+          : 'Speak in Arabic with a natural, clear male voice. Sound like a real patient.'
       });
 
       const buffer = Buffer.from(await response.arrayBuffer());

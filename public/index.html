@@ -8,38 +8,85 @@
 </head>
 <body>
     <div class="container">
-        <header>
+        <header id="main-header" style="display:none;">
             <h1>🏥 أفاتار طبي تفاعلي</h1>
             <p>نظام تدريب OSCE</p>
         </header>
 
-        <div id="setup-screen" class="screen active">
-            <div class="card">
-                <h2>ابدأ جلسة تدريب جديدة</h2>
-                
-                <div class="form-group">
-                    <label>اسمك:</label>
-                    <input type="text" id="student-name" placeholder="أدخل اسمك">
+        <!-- Screen 0: Password -->
+        <div id="password-screen" class="screen active">
+            <div class="password-page">
+                <div class="password-box">
+                    <div class="password-icon">🔒</div>
+                    <h2>أدخل كلمة المرور</h2>
+                    <input type="password" id="password-input" placeholder="كلمة المرور..." onkeypress="if(event.key==='Enter') checkPassword()">
+                    <button class="btn-primary" onclick="checkPassword()">دخول</button>
+                    <p id="password-error" class="password-error"></p>
                 </div>
-
-                <div class="form-group">
-                    <label>اللغة / Language:</label>
-                    <select id="language-select">
-                        <option value="ar">العربية (Arabic)</option>
-                        <option value="en">English (الإنجليزية)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>اختر الحالة / Select Case:</label>
-                    <select id="case-select">
-                        <option value="">جاري التحميل...</option>
-                    </select>
-                </div>
-
-                <button id="start-btn" class="btn-primary">ابدأ الجلسة</button>
             </div>
         </div>
+
+        <!-- Screen 1: Welcome + Department Selection -->
+        <div id="welcome-screen" class="screen">
+            <div class="top-logos-bar">
+                <img src="/data/imge/l_logo.webp" alt="جامعة النجاح الوطنية" class="top-logo-img">
+            </div>
+            <div class="welcome-page">
+                <div class="welcome-top">
+                    <h2>المريض الافتراضي - OSCE</h2>
+                    <p class="welcome-desc">تدرّب على مهاراتك السريرية مع مرضى افتراضيين بالذكاء الاصطناعي</p>
+                </div>
+
+                <div class="name-input-box">
+                    <input type="text" id="student-name" placeholder="👤  اسم الطالب...">
+                </div>
+
+                <div class="departments-grid">
+                    <div class="dept-card" onclick="selectDepartment('Internal Medicine')">
+                        <div class="dept-icon"><img src="/data/imge/internal-icon.png" alt="الطب الباطني" class="dept-img"></div>
+                        <div class="dept-name">الطب الباطني</div>
+                        <div class="dept-sub">Internal Medicine</div>
+                    </div>
+                    <div class="dept-card" onclick="selectDepartment('Surgery')">
+                        <div class="dept-icon"><img src="/data/imge/surgery-icon.png" alt="الجراحة العامة" class="dept-img"></div>
+                        <div class="dept-name">الجراحة العامة</div>
+                        <div class="dept-sub">General Surgery</div>
+                    </div>
+                </div>
+            </div>
+            <footer class="welcome-footer">
+                <div class="footer-divider"></div>
+                <div class="footer-content">
+                    <p class="footer-credit">تطوير وتصميم: وحدة ليمينال للحلول التقنية والذكية</p>
+                    <p class="footer-contact">info@liminal.ps  |  +970 9 2345 113</p>
+                    <a href="https://liminal.nn.ps/ar/" target="_blank" class="footer-link">liminal.nn.ps</a>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Screen 2: Session Selection -->
+        <div id="session-select-screen" class="screen">
+            <div class="selection-container">
+                <button class="btn-back" onclick="goBack('welcome-screen')">→ رجوع</button>
+                <h2 class="selection-title" id="session-screen-title">اختر الفترة</h2>
+                <div class="sessions-grid">
+                    <div class="session-card" onclick="selectSession('morning')">
+                        <div class="session-name">الفترة الصباحية</div>
+                        <div class="session-sub">Morning Session</div>
+                    </div>
+                    <div class="session-card" onclick="selectSession('evening')">
+                        <div class="session-name">الفترة المسائية</div>
+                        <div class="session-sub">Evening Session</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden elements for JS logic -->
+        <select id="case-select" style="display:none;"><option value=""></option></select>
+        <input type="hidden" id="department-select" />
+        <input type="hidden" id="session-select" />
+        <input type="hidden" id="language-select" value="ar" />
 
         <div id="session-screen" class="screen">
             <div class="session-layout">
@@ -67,13 +114,17 @@
                                 <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
                             </svg>
                         </button>
+                        <div class="timer-box">
+                            <span id="session-timer">00:00</span>
+                            <button id="timer-toggle-btn" class="timer-btn" onclick="toggleTimer()" title="إيقاف/تشغيل المؤقت">⏸</button>
+                        </div>
                         <button id="end-btn" class="control-btn end-btn" title="إنهاء الجلسة">
                             <svg viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M16.5 2.25h3.75c.69 0 1.25.56 1.25 1.25v3.75c0 .69-.56 1.25-1.25 1.25h-3.75c-.69 0-1.25-.56-1.25-1.25V3.5c0-.69.56-1.25 1.25-1.25zm0 13.5h3.75c.69 0 1.25.56 1.25 1.25v3.75c0 .69-.56 1.25-1.25 1.25h-3.75c-.69 0-1.25-.56-1.25-1.25V17c0-.69.56-1.25 1.25-1.25zM3.75 2.25H7.5c.69 0 1.25.56 1.25 1.25v3.75c0 .69-.56 1.25-1.25 1.25H3.75C3.06 8.5 2.5 7.94 2.5 7.25V3.5c0-.69.56-1.25 1.25-1.25zm0 13.5H7.5c.69 0 1.25.56 1.25 1.25v3.75c0 .69-.56 1.25-1.25 1.25H3.75c-.69 0-1.25-.56-1.25-1.25V17c0-.69.56-1.25 1.25-1.25z"/>
                             </svg>
                         </button>
                     </div>
-                    <p id="mic-status" class="mic-hint">🎤 اضغط على المايك للتحدث</p>
+                    <p id="mic-status" class="mic-hint">🎤 اضغط مطولاً على مسطرة الكيبورد (Space) للتحدث، ثم ارفع إصبعك لإرسال السؤال</p>
                 </div>
 
                 <div class="info-section">

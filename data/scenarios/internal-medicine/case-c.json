@@ -3,13 +3,14 @@
   "title": "Cushing Syndrome - Fracture and Weight Gain",
   "difficulty": "advanced",
   "examType": "OSCE",
-  "department": "Internal Medicine Clinic",
+  "department": "Internal Medicine",
+  "session": "morning",
   "patientInfo": {
     "name": "Ms. Sara Ahmad",
     "age": 37,
     "gender": "female",
     "occupation": "Housewife",
-    "patientImage": "/data/imge/avatar-case-c.png"
+    "patientImage": "/data/imge/internal-medicine/avatar-case-c.png"
   },
   "referralReason": "Right radius/ulnar fracture after minor trauma",
   "presentingComplaintFull": "I broke my arm after a simple fall last week, and the doctor said the fracture shouldn't have happened from such a small injury. I've also gained a lot of weight over the last two years.",
@@ -231,7 +232,7 @@
     "striae": {
       "title": "Purple Striae (خطوط أرجوانية)",
       "description": "علامة من علامات Cushing Syndrome - خطوط أرجوانية على الجلد",
-      "imagePath": "/data/imge/img1-c.png",
+      "imagePath": "/data/imge/internal-medicine/img1-c.png",
       "englishTerms": ["purple striae", "striae", "stretch marks", "skin findings"]
     }
   },

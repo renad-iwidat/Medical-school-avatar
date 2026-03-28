@@ -1,7 +1,7 @@
 // Global state
 let currentSession = null;
 let currentScenario = null;
-let selectedLanguage = 'ar'; // Default Arabic
+let selectedLanguage = 'ar'; // Always Arabic
 let socket = null; // WebSocket connection
 
 // Fallback translations if translations.js not loaded
@@ -38,40 +38,120 @@ function showScreen(screenId) {
     document.getElementById(screenId).classList.add('active');
 }
 
+function goBack(screenId) {
+    showScreen(screenId);
+}
+
+// Password check
+function checkPassword() {
+    const input = document.getElementById('password-input');
+    const error = document.getElementById('password-error');
+    if (input.value === '55555') {
+        error.textContent = '';
+        input.value = '';
+        showScreen('welcome-screen');
+    } else {
+        error.textContent = 'كلمة المرور غير صحيحة';
+        input.value = '';
+        input.focus();
+    }
+}
+
+// Department selection
+let selectedDepartment = '';
+function selectDepartment(dept) {
+    const studentName = document.getElementById('student-name').value.trim();
+    if (!studentName) {
+        alert('الرجاء إدخال اسمك أولاً 👤');
+        document.getElementById('student-name').focus();
+        return;
+    }
+    selectedDepartment = dept;
+    document.getElementById('department-select').value = dept;
+    
+    const deptLabel = dept === 'Internal Medicine' ? 'الباطني' : 'الجراحة';
+    document.getElementById('session-screen-title').textContent = `اختر الفترة - ${deptLabel}`;
+    
+    showScreen('session-select-screen');
+}
+
+// Session selection - auto starts the session
+function selectSession(session) {
+    document.getElementById('session-select').value = session;
+    
+    // Find matching scenario
+    const filtered = allScenarios.filter(s => s.department === selectedDepartment && s.session === session);
+    if (filtered.length === 0) {
+        alert(selectedLanguage === 'ar' ? 'لا توجد حالات متاحة لهذا الاختيار' : 'No cases available for this selection');
+        return;
+    }
+    
+    const select = document.getElementById('case-select');
+    select.innerHTML = `<option value="${filtered[0].id}">${filtered[0].title}</option>`;
+    select.value = filtered[0].id;
+    
+    // Trigger session start
+    startSession();
+}
+
+// Session Timer
+let timerInterval = null;
+let timerSeconds = 0;
+let timerRunning = false;
+
+function startTimer() {
+    timerSeconds = 0;
+    timerRunning = true;
+    document.getElementById('session-timer').textContent = '00:00';
+    document.getElementById('timer-toggle-btn').textContent = '⏸';
+    timerInterval = setInterval(() => {
+        if (timerRunning) {
+            timerSeconds++;
+            const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+            const secs = String(timerSeconds % 60).padStart(2, '0');
+            document.getElementById('session-timer').textContent = `${mins}:${secs}`;
+        }
+    }, 1000);
+}
+
+function stopTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    timerRunning = false;
+}
+
+function toggleTimer() {
+    const btn = document.getElementById('timer-toggle-btn');
+    if (timerRunning) {
+        timerRunning = false;
+        btn.textContent = '▶';
+    } else {
+        timerRunning = true;
+        btn.textContent = '⏸';
+    }
+}
+
 // Load scenarios on page load
+let allScenarios = [];
+
 async function loadScenarios() {
     console.log('📚 Loading scenarios...');
     try {
         const response = await fetch('/api/scenarios');
         const scenarios = await response.json();
         console.log('✅ Scenarios loaded:', scenarios.length, 'scenarios');
-        console.log('Scenario IDs:', scenarios.map(s => s.id));
-        
-        const select = document.getElementById('case-select');
         
         // Remove duplicates based on ID
-        const uniqueScenarios = [];
         const seenIds = new Set();
-        
+        allScenarios = [];
         scenarios.forEach(s => {
             if (!seenIds.has(s.id)) {
                 seenIds.add(s.id);
-                uniqueScenarios.push(s);
+                allScenarios.push(s);
             }
         });
         
-        console.log('✅ Unique scenarios:', uniqueScenarios.length);
-        
-        select.innerHTML = uniqueScenarios.map(s => {
-            // Determine case letter
-            let caseLetter = 'L';
-            if (s.id.includes('cushing')) caseLetter = 'C';
-            else if (s.id.includes('sarcoidosis')) caseLetter = 'S';
-            else if (s.id.includes('gout')) caseLetter = 'G';
-            
-            return `<option value="${s.id}">Case ${caseLetter}</option>`;
-        }).join('');
-        console.log('✅ Scenarios populated in dropdown');
+        console.log('✅ Unique scenarios:', allScenarios.length);
     } catch (error) {
         console.error('❌ Error loading scenarios:', error);
         alert('فشل تحميل السيناريوهات');
@@ -79,22 +159,25 @@ async function loadScenarios() {
 }
 
 // Start session
-document.getElementById('start-btn').addEventListener('click', async () => {
-    console.log('🔵 Start button clicked!');
+async function startSession() {
+    console.log('🔵 Starting session!');
     
     const studentName = document.getElementById('student-name').value.trim();
     const scenarioId = document.getElementById('case-select').value;
-    selectedLanguage = document.getElementById('language-select').value;
+    const department = document.getElementById('department-select').value;
+    const session = document.getElementById('session-select').value;
     
     console.log('📝 Student name:', studentName);
     console.log('📋 Scenario ID:', scenarioId);
+    console.log('🏥 Department:', department);
+    console.log('🕐 Session:', session);
     console.log('🌐 Language:', selectedLanguage);
     
-    if (!studentName || !scenarioId) {
+    if (!studentName || !department || !session || !scenarioId) {
         console.log('❌ Missing data!');
         const alertMsg = selectedLanguage === 'ar' 
-            ? 'الرجاء إدخال جميع البيانات'
-            : 'Please enter all required information';
+            ? 'الرجاء إدخال جميع البيانات واختيار القسم والفترة'
+            : 'Please enter all required information and select department and session';
         alert(alertMsg);
         return;
     }
@@ -157,6 +240,26 @@ document.getElementById('start-btn').addEventListener('click', async () => {
         console.log('🎬 Showing session screen...');
         showScreen('session-screen');
         
+        // Pre-generate welcome TTS audio in background
+        const t = translations['ar'];
+        let patientNameArabic = '';
+        if (t.patientNames && t.patientNames[currentScenario.patientInfo.name]) {
+            patientNameArabic = t.patientNames[currentScenario.patientInfo.name];
+        } else {
+            patientNameArabic = currentScenario.patientInfo.name;
+        }
+        const patientGender = currentScenario.patientInfo.gender;
+        const patientLabel = patientGender === 'male' ? 'المريض الافتراضي الخاص' : 'المريضة الافتراضية الخاصة';
+        const welcomeMsg = `مرحباً، أنا ${patientNameArabic}، ${patientLabel} بك اليوم. تفضل اسألني يلي بدك ياه.`;
+        
+        // Start fetching TTS audio immediately (don't await)
+        window._welcomeTTSPromise = fetch('/api/tts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: welcomeMsg, gender: patientGender })
+        }).then(r => r.ok ? r.blob() : null).catch(() => null);
+        window._welcomeMsg = welcomeMsg;
+        
         // Initialize WebSocket connection
         initializeWebSocket();
     } catch (error) {
@@ -168,7 +271,7 @@ document.getElementById('start-btn').addEventListener('click', async () => {
             : 'Failed to start session: ' + error.message;
         alert(alertMsg);
     }
-});
+}
 
 // Display patient image or video
 function displayPatientImage() {
@@ -329,10 +432,10 @@ function displayPatientInfo() {
     // Translate name to Arabic - check translations first
     let patientNameArabic = '';
     if (t.patientNames && t.patientNames[patient.name]) {
-        patientNameArabic = `السيد ${t.patientNames[patient.name]}`;
+        const prefix = patient.gender === 'male' ? 'السيد' : 'السيدة';
+        patientNameArabic = `${prefix} ${t.patientNames[patient.name]}`;
     } else {
-        const gender = patient.gender;
-        const prefix = gender === 'male' ? 'السيد' : 'السيدة';
+        const prefix = patient.gender === 'male' ? 'السيد' : 'السيدة';
         patientNameArabic = `${prefix} ${patient.name}`;
     }
     
@@ -400,22 +503,42 @@ function displayInvestigationImages() {
     });
     
     let imagesHTML = `
-        <button id="toggle-images-btn" class="btn-toggle-images" onclick="toggleInvestigationImages()">
+        <button id="toggle-images-btn" class="btn-toggle-images" onclick="showImageOverlay()">
             📸 عرض الصور الطبية
         </button>
-        <div id="images-content" class="images-content hidden">
     `;
     
+    // Build hidden overlay for full-screen image viewing
+    let overlayHTML = '<div id="images-overlay" class="images-overlay hidden" onclick="closeImageOverlay(event)">';
+    overlayHTML += '<div class="images-overlay-content">';
+    overlayHTML += '<button class="images-overlay-close" onclick="closeImageOverlay()">✕</button>';
     imagesData.forEach(img => {
-        imagesHTML += `
-            <div class="investigation-image-item">
-                <img src="${img.path}" alt="${img.title}" style="display: block; width: 100%; max-width: 400px; border-radius: 8px;" />
+        overlayHTML += `
+            <div class="overlay-image-item">
+                <img src="${img.path}" alt="${img.title}" />
+                <p>${img.title}</p>
             </div>
         `;
     });
+    overlayHTML += '</div></div>';
     
-    imagesHTML += '</div>';
     imagesContainer.innerHTML = imagesHTML;
+    
+    // Add overlay to body if not already there
+    let existing = document.getElementById('images-overlay');
+    if (existing) existing.remove();
+    document.body.insertAdjacentHTML('beforeend', overlayHTML);
+}
+
+function showImageOverlay() {
+    const overlay = document.getElementById('images-overlay');
+    if (overlay) overlay.classList.remove('hidden');
+}
+
+function closeImageOverlay(event) {
+    if (event && event.target !== event.currentTarget && !event.target.classList.contains('images-overlay-close')) return;
+    const overlay = document.getElementById('images-overlay');
+    if (overlay) overlay.classList.add('hidden');
 }
 
 // Speech Recognition Setup
@@ -429,7 +552,7 @@ function initializeSpeechRecognition() {
         
         // Set language based on selection
         recognition.lang = selectedLanguage === 'ar' ? 'ar-SA' : 'en-US';
-        recognition.continuous = true; // استمر في الاستماع
+        recognition.continuous = true;
         recognition.interimResults = false;
 
         recognition.onresult = (event) => {
@@ -536,8 +659,7 @@ async function speak(text) {
                     URL.revokeObjectURL(audioUrl);
                     currentAudio = null;
                     pauseAvatarVideo();
-                    console.log('⚠️ OpenAI TTS error, falling back to browser');
-                    speakWithBrowser(text, soundWave);
+                    console.log('⚠️ OpenAI TTS error');
                 };
 
                 await currentAudio.play();
@@ -545,12 +667,21 @@ async function speak(text) {
                 return;
             }
         } catch (e) {
-            console.log('⚠️ OpenAI TTS failed, falling back to browser:', e.message);
+            console.log('⚠️ OpenAI TTS failed:', e.message);
         }
     }
 
-    // Fallback to browser TTS
-    speakWithBrowser(text, soundWave);
+    // No fallback - only OpenAI TTS
+    if (soundWave) soundWave.classList.remove('active');
+    pauseAvatarVideo();
+}
+
+// Fetch TTS audio first, then show text + play audio together
+async function speakWithText(text) {
+    // Show text immediately
+    addToTranscript('avatar', text);
+    // Play audio in parallel (don't wait)
+    speak(text);
 }
 
 function speakWithBrowser(text, soundWave) {
@@ -634,57 +765,74 @@ if ('speechSynthesis' in window) {
     };
 }
 
-// Microphone control (Toggle mode)
+// Microphone control (Toggle mode + Push-to-talk)
 document.getElementById('mic-btn').addEventListener('click', () => {
+    if (!currentSession) return;
+    if (isRecording) {
+        stopMic();
+    } else {
+        startMic();
+    }
+});
+
+// Push-to-talk with Spacebar
+function startMic() {
     const micBtn = document.getElementById('mic-btn');
     const micStatus = document.getElementById('mic-status');
     
-    // Initialize recognition if not already done
+    if (isRecording) return; // Already recording
+    
     if (!recognition) {
         initializeSpeechRecognition();
     }
+    if (!recognition) return;
     
-    if (!recognition) {
-        const alertMsg = selectedLanguage === 'ar' 
-            ? 'التعرف على الصوت غير مدعوم في هذا المتصفح. استخدم Chrome أو Edge.'
-            : 'Speech recognition not supported in this browser. Use Chrome or Edge.';
-        alert(alertMsg);
-        return;
+    try {
+        recognition.start();
+        isRecording = true;
+        micBtn.classList.add('active');
+        micStatus.textContent = '🎤 يستمع... ارفع إصبعك عن المسطرة لإرسال السؤال';
+        console.log('✅ Microphone ON');
+    } catch (e) {
+        console.log('Recognition already started');
     }
+}
+
+function stopMic() {
+    const micBtn = document.getElementById('mic-btn');
+    const micStatus = document.getElementById('mic-status');
     
-    // Toggle recording state
-    if (!isRecording) {
-        // Start recording
-        try {
-            recognition.start();
-            isRecording = true;
-            micBtn.classList.add('active');
-            const statusText = selectedLanguage === 'ar' 
-                ? '🎤 يستمع... (اضغط للإيقاف)'
-                : '🎤 Listening... (Click to stop)';
-            micStatus.textContent = statusText;
-            console.log('✅ Microphone ON - Continuous listening');
-        } catch (error) {
-            console.error('Error starting recognition:', error);
-            const alertMsg = selectedLanguage === 'ar' 
-                ? 'فشل تفعيل الميكروفون'
-                : 'Failed to activate microphone';
-            alert(alertMsg);
-        }
-    } else {
-        // Stop recording
-        try {
-            recognition.stop();
-            isRecording = false;
-            micBtn.classList.remove('active');
-            const statusText = selectedLanguage === 'ar' 
-                ? '🎤 متوقف (اضغط للتشغيل)'
-                : '🎤 Stopped (Click to start)';
-            micStatus.textContent = statusText;
-            console.log('⏸️ Microphone OFF');
-        } catch (error) {
-            console.error('Error stopping recognition:', error);
-        }
+    if (!isRecording) return;
+    
+    try {
+        recognition.stop();
+        isRecording = false;
+        micBtn.classList.remove('active');
+        micStatus.textContent = '🎤 اضغط مطولاً على مسطرة الكيبورد (Space) للتحدث';
+        console.log('⏸️ Microphone OFF');
+    } catch (e) {
+        console.error('Error stopping recognition:', e);
+    }
+}
+
+// Spacebar keydown = start mic, keyup = stop mic
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && !e.repeat) {
+        // Don't trigger if typing in input field
+        if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+        // Only work during session
+        if (!currentSession) return;
+        e.preventDefault();
+        startMic();
+    }
+});
+
+document.addEventListener('keyup', (e) => {
+    if (e.code === 'Space') {
+        if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+        if (!currentSession) return;
+        e.preventDefault();
+        stopMic();
     }
 });
 
@@ -700,6 +848,9 @@ document.getElementById('end-btn').addEventListener('click', async () => {
 
 async function endSession() {
     try {
+        // Stop timer
+        stopTimer();
+        
         // Stop all audio immediately
         stopSpeaking();
         console.log('🔇 Speech stopped');
@@ -718,19 +869,25 @@ async function endSession() {
             socket.disconnect();
         }
         
-        // Show end session message
-        const messageAr = 'شكراً لك على المشاركة في هذه الجلسة التدريبية';
-        const messageEn = 'Thank you for participating in this training session';
-        const message = selectedLanguage === 'ar' ? messageAr : messageEn;
+        // Show thank you message then redirect to welcome
+        currentSession = null;
+        currentScenario = null;
         
-        document.getElementById('results-content').innerHTML = `<p>${message}</p>`;
-        showScreen('results-screen');
+        // Show thank you overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'thank-you-overlay';
+        overlay.innerHTML = '<div class="thank-you-box"><div class="thank-you-icon">✅</div><p>شكراً لك على المشاركة في هذه الجلسة التدريبية</p></div>';
+        document.body.appendChild(overlay);
+        
+        // After 2.5 seconds, go back to welcome screen
+        setTimeout(() => {
+            overlay.remove();
+            showScreen('password-screen');
+        }, 2500);
+        
     } catch (error) {
         console.error('Error ending session:', error);
-        const alertMsg = selectedLanguage === 'ar' 
-            ? 'فشل إنهاء الجلسة'
-            : 'Failed to end session';
-        alert(alertMsg);
+        alert('فشل إنهاء الجلسة');
     }
 }
 
@@ -755,7 +912,7 @@ document.getElementById('new-session-btn').addEventListener('click', () => {
     
     currentSession = null;
     currentScenario = null;
-    showScreen('setup-screen');
+    showScreen('password-screen');
 });
 
 // Initialize WebSocket connection
@@ -764,45 +921,55 @@ function initializeWebSocket() {
     
     socket = io();
     
-    socket.on('connect', () => {
+    socket.on('connect', async () => {
         console.log('✅ WebSocket connected:', socket.id);
         
-        // Send welcome message to transcript after connection
-        if (currentSession && currentScenario) {
-            const t = translations['ar'];
-            let patientNameArabic = '';
-            if (t.patientNames && t.patientNames[currentScenario.patientInfo.name]) {
-                patientNameArabic = t.patientNames[currentScenario.patientInfo.name];
-            } else {
-                patientNameArabic = currentScenario.patientInfo.name;
+        if (currentSession && currentScenario && window._welcomeMsg) {
+            addToTranscript('avatar', window._welcomeMsg);
+            
+            // Use pre-fetched TTS audio
+            if (window._welcomeTTSPromise) {
+                const audioBlob = await window._welcomeTTSPromise;
+                if (audioBlob) {
+                    const soundWave = document.getElementById('sound-wave');
+                    if (soundWave) soundWave.classList.add('active');
+                    startAvatarVideo();
+                    
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    currentAudio = new Audio(audioUrl);
+                    currentAudio.onended = () => {
+                        if (soundWave) soundWave.classList.remove('active');
+                        URL.revokeObjectURL(audioUrl);
+                        currentAudio = null;
+                        pauseAvatarVideo();
+                    };
+                    currentAudio.onerror = () => {
+                        if (soundWave) soundWave.classList.remove('active');
+                        URL.revokeObjectURL(audioUrl);
+                        currentAudio = null;
+                        pauseAvatarVideo();
+                    };
+                    await currentAudio.play();
+                    // Start timer when avatar actually starts speaking
+                    startTimer();
+                }
+                window._welcomeTTSPromise = null;
+                window._welcomeMsg = null;
             }
-            
-            const patientGender = currentScenario.patientInfo.gender;
-            const patientLabel = patientGender === 'male' ? 'المريض' : 'المريضة';
-            
-            const genderSuffix = patientGender === 'male' 
-                ? 'الافتراضي الخاص' 
-                : 'الافتراضية الخاصة';
-            const welcomeMsg = `مرحباً، أنا ${patientNameArabic}، ${patientLabel} ${genderSuffix} بك اليوم. تم تطويري من قبل وحدة ليمينال في جامعة النجاح لمساعدتك بالتدريب السريري. تفضل اسألني أي سؤال.`;
-            
-            addToTranscript('avatar', welcomeMsg);
-            speak(welcomeMsg);
         }
     });
     
     socket.on('chat-response', (data) => {
         console.log('📨 Received response:', data);
         
-        // Add agent response to transcript
         if (data.response) {
-            addToTranscript('avatar', data.response);
-            
             // Generate Hedra video only if no local video available
             if (currentScenario && currentScenario.patientInfo && currentScenario.patientInfo.patientImage && !currentScenario.patientInfo.patientVideo) {
                 generatePatientVideo(data.response);
             }
             
-            speak(data.response);
+            // Show text and play audio together
+            speakWithText(data.response);
         }
     });
     

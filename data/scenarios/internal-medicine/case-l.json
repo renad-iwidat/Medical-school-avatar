@@ -3,15 +3,15 @@
   "title": "Systemic Lupus Erythematosus (SLE) - Joint Pain and Fatigue",
   "difficulty": "advanced",
   "examType": "OSCE",
-  "department": "Internal Medicine Clinic / Emergency Department",
+  "department": "Internal Medicine",
+  "session": "evening",
   "patientInfo": {
     "name": "Sarah Ahmed",
     "age": 23,
     "gender": "female",
     "occupation": "Graphic designer",
     "maritalStatus": "Married",
-    "patientImage": "/data/imge/avatar-case-l.png",
-    "patientVideo": "/data/videos/video-case-l.mp4"
+    "patientImage": "/data/imge/internal-medicine/avatar-case-l.png"
   },
   "presentingComplaintShort": "bilateral hand pain",
   "presentingComplaintFull": "I've been feeling very tired for the past few months, and my hands have been hurting.",

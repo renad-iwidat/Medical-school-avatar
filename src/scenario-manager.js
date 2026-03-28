@@ -13,30 +13,37 @@ export class ScenarioManager {
   }
 
   loadScenarios() {
-    try {
-      const files = fs.readdirSync(this.scenariosPath);
-      
-      files.forEach(file => {
-        if (file.endsWith('.json')) {
-          const filePath = path.join(this.scenariosPath, file);
-          const data = fs.readFileSync(filePath, 'utf8');
-          const scenario = JSON.parse(data);
-          this.scenarios.set(scenario.id, scenario);
-        }
-      });
-      
-      console.log(`✅ Loaded ${this.scenarios.size} scenarios`);
-    } catch (error) {
-      console.error('Error loading scenarios:', error);
+      try {
+        this._loadFromDir(this.scenariosPath);
+        console.log(`✅ Loaded ${this.scenarios.size} scenarios`);
+      } catch (error) {
+        console.error('Error loading scenarios:', error);
+      }
     }
+
+  _loadFromDir(dirPath) {
+    const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+    entries.forEach(entry => {
+      const fullPath = path.join(dirPath, entry.name);
+      if (entry.isDirectory()) {
+        this._loadFromDir(fullPath);
+      } else if (entry.name.endsWith('.json')) {
+        const data = fs.readFileSync(fullPath, 'utf8');
+        const scenario = JSON.parse(data);
+        this.scenarios.set(scenario.id, scenario);
+      }
+    });
   }
+
 
   listScenarios() {
     const scenarios = Array.from(this.scenarios.values()).map(s => ({
       id: s.id,
       title: s.title,
       difficulty: s.difficulty,
-      chiefComplaint: s.chiefComplaint
+      chiefComplaint: s.chiefComplaint,
+      department: s.department,
+      session: s.session
     }));
     
     console.log(`📋 Returning ${scenarios.length} scenarios:`, scenarios.map(s => s.id));

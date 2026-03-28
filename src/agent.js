@@ -40,20 +40,12 @@ export class MedicalAvatarAgent {
 
   getWelcomeMessage(scenario, language = 'ar') {
     const patientName = scenario.patientInfo.name;
-    const patientGender = scenario.patientInfo.gender === 'female' ? 'ة' : '';
+    const patientLabel = scenario.patientInfo.gender === 'male' ? 'المريض الافتراضي الخاص' : 'المريضة الافتراضية الخاصة';
     
     if (language === 'ar') {
-      return `مرحباً، أنا ${patientName}، المريضة الافتراضية الخاصة بك اليوم.
-
-تم تطويري من قبل وحدة ليمينال في مركز الإعلام بجامعة النجاح الوطنية لتدريبك على مهاراتك السريرية بأمان وثقة.
-
-هيا نبدأ رحلتنا معاً بطريقة مريحة وممتعة!`;
+      return `مرحباً، أنا ${patientName}، ${patientLabel} بك اليوم. تفضل اسألني يلي بدك ياه.`;
     } else {
-      return `Hello, I'm ${patientName}, your virtual patient today.
-
-I was developed by the Liminal Unit at the Media Center of An-Najah National University to help you practice your clinical skills safely and confidently.
-
-Let's start our journey together in a comfortable and fun way!`;
+      return `Hello, I'm ${patientName}, your virtual patient today. Feel free to ask me anything.`;
     }
   }
 
