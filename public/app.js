@@ -616,26 +616,34 @@ async function checkTTSStatus() {
 }
 
 async function speak(text) {
-    // Check TTS status if not checked yet
     if (ttsEnabled === null) {
         await checkTTSStatus();
     }
 
-    // Stop any current audio
     stopSpeaking();
 
     const soundWave = document.getElementById('sound-wave');
     if (soundWave) soundWave.classList.add('active');
-
-    // Start avatar video when speaking begins
     startAvatarVideo();
 
-    // Try OpenAI TTS first
     if (ttsEnabled) {
         try {
             const gender = currentScenario?.patientInfo?.gender || 'female';
-            console.log(`🔊 Using OpenAI TTS | Gender: ${gender}`);
 
+            // Create audio element that plays as it downloads
+            currentAudio = new Audio();
+            currentAudio.onended = () => {
+                if (soundWave) soundWave.classList.remove('active');
+                currentAudio = null;
+                pauseAvatarVideo();
+            };
+            currentAudio.onerror = () => {
+                if (soundWave) soundWave.classList.remove('active');
+                currentAudio = null;
+                pauseAvatarVideo();
+            };
+
+            // Fetch and start playing as soon as possible
             const response = await fetch('/api/tts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -645,29 +653,18 @@ async function speak(text) {
             if (response.ok && response.headers.get('content-type')?.includes('audio')) {
                 const audioBlob = await response.blob();
                 const audioUrl = URL.createObjectURL(audioBlob);
-
-                currentAudio = new Audio(audioUrl);
+                currentAudio.src = audioUrl;
                 currentAudio.onended = () => {
                     if (soundWave) soundWave.classList.remove('active');
                     URL.revokeObjectURL(audioUrl);
                     currentAudio = null;
                     pauseAvatarVideo();
-                    console.log('✅ OpenAI TTS completed');
                 };
-                currentAudio.onerror = () => {
-                    if (soundWave) soundWave.classList.remove('active');
-                    URL.revokeObjectURL(audioUrl);
-                    currentAudio = null;
-                    pauseAvatarVideo();
-                    console.log('⚠️ OpenAI TTS error');
-                };
-
                 await currentAudio.play();
-                console.log('🔊 OpenAI TTS playing');
                 return;
             }
         } catch (e) {
-            console.log('⚠️ OpenAI TTS failed:', e.message);
+            console.log('⚠️ TTS failed:', e.message);
         }
     }
 

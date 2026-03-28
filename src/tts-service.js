@@ -18,19 +18,12 @@ export class TTSService {
     return this.client !== null;
   }
 
-  /**
-   * Generate speech audio from text
-   * @param {string} text - Text to convert to speech
-   * @param {string} gender - 'male' or 'female'
-   * @returns {Buffer} - Audio buffer (mp3)
-   */
   async generateSpeech(text, gender = 'female') {
     if (!this.isEnabled()) {
       return null;
     }
 
     try {
-      // Pick voice based on gender
       const voice = gender === 'female' ? 'nova' : 'echo';
       
       console.log(`🔊 Generating TTS | Voice: ${voice} | Gender: ${gender} | Text: ${text.substring(0, 50)}...`);
@@ -39,11 +32,11 @@ export class TTSService {
         model: 'gpt-4o-mini-tts',
         voice: voice,
         input: text,
-        speed: 1.5,
+        speed: 1.4,
         response_format: 'mp3',
         instructions: gender === 'female' 
-          ? 'Speak in Arabic with a natural, warm female voice. Sound like a real patient.'
-          : 'Speak in Arabic with a natural, clear male voice. Sound like a real patient.'
+          ? 'Speak in Arabic with a natural, warm female voice. Sound like a real patient - slightly worried and tired.'
+          : 'Speak in Arabic with a natural, clear male voice. Sound like a real patient - express pain and concern naturally.'
       });
 
       const buffer = Buffer.from(await response.arrayBuffer());
