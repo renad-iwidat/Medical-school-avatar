@@ -927,3 +927,63 @@ header p {
     margin-top: 8px;
     min-height: 20px;
 }
+
+/* ===== STUDENT NAME SCREEN ===== */
+.student-name-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: 20px;
+}
+
+.student-name-box {
+    background: white;
+    border-radius: 18px;
+    padding: 40px 35px;
+    text-align: center;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 400px;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.student-name-icon {
+    font-size: 55px;
+    margin-bottom: 10px;
+}
+
+.student-name-box h2 {
+    color: #1a3a5c;
+    font-size: 1.3em;
+    margin-bottom: 8px;
+}
+
+.student-name-dept-label {
+    color: #2a5f8f;
+    font-size: 0.95em;
+    margin-bottom: 18px;
+    font-weight: 600;
+}
+
+.student-name-box input {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+    text-align: center;
+    outline: none;
+    margin-bottom: 14px;
+    transition: border-color 0.3s;
+}
+
+.student-name-box input:focus {
+    border-color: #2a5f8f;
+    box-shadow: 0 4px 20px rgba(26, 58, 92, 0.15);
+}
+
+.student-name-box .btn-primary {
+    margin-top: 4px;
+}

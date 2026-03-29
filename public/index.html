@@ -26,7 +26,7 @@
             </div>
         </div>
 
-        <!-- Screen 1: Welcome + Department Selection -->
+        <!-- Screen 1: Welcome + Department Selection (no student name here) -->
         <div id="welcome-screen" class="screen">
             <div class="top-logos-bar">
                 <img src="/data/imge/l_logo.webp" alt="جامعة النجاح الوطنية" class="top-logo-img">
@@ -35,10 +35,6 @@
                 <div class="welcome-top">
                     <h2>المريض الافتراضي - OSCE</h2>
                     <p class="welcome-desc">تدرّب على مهاراتك السريرية مع مرضى افتراضيين بالذكاء الاصطناعي</p>
-                </div>
-
-                <div class="name-input-box">
-                    <input type="text" id="student-name" placeholder="👤  اسم الطالب...">
                 </div>
 
                 <div class="departments-grid">
@@ -78,6 +74,20 @@
                         <div class="session-name">الفترة المسائية</div>
                         <div class="session-sub">Evening Session</div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 3: Student Name Entry -->
+        <div id="student-name-screen" class="screen">
+            <div class="student-name-container">
+                <button class="btn-back" onclick="goBack('session-select-screen')">→ رجوع</button>
+                <div class="student-name-box">
+                    <div class="student-name-icon">👤</div>
+                    <h2>أدخل اسم الطالب</h2>
+                    <p class="student-name-dept-label" id="student-name-dept-label"></p>
+                    <input type="text" id="student-name" placeholder="اسم الطالب..." onkeypress="if(event.key==='Enter') confirmStudentName()">
+                    <button class="btn-primary" onclick="confirmStudentName()">ابدأ الجلسة</button>
                 </div>
             </div>
         </div>

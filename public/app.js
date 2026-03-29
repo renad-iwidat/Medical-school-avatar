@@ -59,13 +59,9 @@ function checkPassword() {
 
 // Department selection
 let selectedDepartment = '';
+let selectedSession = '';
+
 function selectDepartment(dept) {
-    const studentName = document.getElementById('student-name').value.trim();
-    if (!studentName) {
-        alert('الرجاء إدخال اسمك أولاً 👤');
-        document.getElementById('student-name').focus();
-        return;
-    }
     selectedDepartment = dept;
     document.getElementById('department-select').value = dept;
     
@@ -75,22 +71,42 @@ function selectDepartment(dept) {
     showScreen('session-select-screen');
 }
 
-// Session selection - auto starts the session
+// Session selection - now goes to student name screen
 function selectSession(session) {
+    selectedSession = session;
     document.getElementById('session-select').value = session;
     
-    // Find matching scenario
+    // Find matching scenario to validate
     const filtered = allScenarios.filter(s => s.department === selectedDepartment && s.session === session);
     if (filtered.length === 0) {
         alert(selectedLanguage === 'ar' ? 'لا توجد حالات متاحة لهذا الاختيار' : 'No cases available for this selection');
         return;
     }
     
+    // Prepare the case select
     const select = document.getElementById('case-select');
     select.innerHTML = `<option value="${filtered[0].id}">${filtered[0].title}</option>`;
     select.value = filtered[0].id;
     
-    // Trigger session start
+    // Show department + session label on student name screen
+    const deptLabel = selectedDepartment === 'Internal Medicine' ? 'الطب الباطني' : 'الجراحة العامة';
+    const sessionLabel = session === 'morning' ? 'الفترة الصباحية' : 'الفترة المسائية';
+    document.getElementById('student-name-dept-label').textContent = `${deptLabel} - ${sessionLabel}`;
+    
+    // Clear previous name and show student name screen
+    document.getElementById('student-name').value = '';
+    document.getElementById('student-name').focus();
+    showScreen('student-name-screen');
+}
+
+// Confirm student name and start session
+function confirmStudentName() {
+    const studentName = document.getElementById('student-name').value.trim();
+    if (!studentName) {
+        alert('الرجاء إدخال اسم الطالب 👤');
+        document.getElementById('student-name').focus();
+        return;
+    }
     startSession();
 }
 
@@ -205,7 +221,9 @@ async function startSession() {
             body: JSON.stringify({ 
                 studentName, 
                 scenarioId,
-                language: selectedLanguage
+                language: selectedLanguage,
+                department,
+                session
             })
         });
         
@@ -866,7 +884,16 @@ async function endSession() {
             socket.disconnect();
         }
         
-        // Show thank you message then redirect to welcome
+        // End session log on server
+        if (currentSession && currentSession.sessionId) {
+            fetch('/api/session/end', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId: currentSession.sessionId })
+            }).catch(() => {});
+        }
+        
+        // Show thank you message then redirect to student name
         currentSession = null;
         currentScenario = null;
         
@@ -876,10 +903,12 @@ async function endSession() {
         overlay.innerHTML = '<div class="thank-you-box"><div class="thank-you-icon">✅</div><p>شكراً لك على المشاركة في هذه الجلسة التدريبية</p></div>';
         document.body.appendChild(overlay);
         
-        // After 2.5 seconds, go back to welcome screen
+        // After 2.5 seconds, go back to student name screen (same dept + session)
         setTimeout(() => {
             overlay.remove();
-            showScreen('password-screen');
+            document.getElementById('student-name').value = '';
+            showScreen('student-name-screen');
+            document.getElementById('student-name').focus();
         }, 2500);
         
     } catch (error) {
@@ -909,7 +938,9 @@ document.getElementById('new-session-btn').addEventListener('click', () => {
     
     currentSession = null;
     currentScenario = null;
-    showScreen('password-screen');
+    document.getElementById('student-name').value = '';
+    showScreen('student-name-screen');
+    document.getElementById('student-name').focus();
 });
 
 // Initialize WebSocket connection

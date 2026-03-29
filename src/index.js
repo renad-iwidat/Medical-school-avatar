@@ -1,4 +1,6 @@
 import express from 'express';
+import fs from 'fs';
+import path from 'path';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
@@ -7,6 +9,7 @@ import { SessionManager } from './session-manager.js';
 import { MedicalAvatarAgent } from './agent.js';
 import { HedraService } from './hedra-service.js';
 import { TTSService } from './tts-service.js';
+import { SessionLogger } from './session-logger.js';
 
 dotenv.config();
 
@@ -36,6 +39,7 @@ const sessionManager = new SessionManager();
 const agent = new MedicalAvatarAgent();
 const hedraService = new HedraService();
 const ttsService = new TTSService();
+const sessionLogger = new SessionLogger();
 
 // Get available scenarios
 app.get('/api/scenarios', (req, res) => {
@@ -55,7 +59,7 @@ app.get('/api/scenarios/:id', (req, res) => {
 // Start new session
 app.post('/api/session/start', async (req, res) => {
   try {
-    const { studentName, scenarioId, language } = req.body;
+    const { studentName, scenarioId, language, department, session: sessionPeriod } = req.body;
     
     if (!studentName || !scenarioId) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -67,6 +71,14 @@ app.post('/api/session/start', async (req, res) => {
     // Initialize session
     sessionManager.createSession(sessionId, scenarioId, studentName);
     
+    // Start logging
+    sessionLogger.startLog(sessionId, {
+      studentName,
+      department: department || '',
+      session: sessionPeriod || '',
+      scenarioId
+    });
+
     // Initialize agent
     const agentInit = await agent.initializeSession(sessionId, scenarioId, language || 'ar');
     console.log(`🤖 ${agentInit.welcomeMessage}`);
@@ -85,6 +97,59 @@ app.post('/api/session/start', async (req, res) => {
 // Get session evaluation
 app.get('/api/evaluation/:sessionId', (req, res) => {
   res.json({ success: true });
+});
+
+// End session (close log)
+app.post('/api/session/end', (req, res) => {
+  const { sessionId } = req.body;
+  if (sessionId) {
+    sessionLogger.endLog(sessionId);
+  }
+  res.json({ success: true });
+});
+
+// View all session logs (for admin/instructor)
+app.get('/api/logs', (req, res) => {
+  try {
+    const logsDir = path.join(process.cwd(), 'logs');
+    if (!fs.existsSync(logsDir)) {
+      return res.json([]);
+    }
+    const files = fs.readdirSync(logsDir)
+      .filter(f => f.endsWith('.json'))
+      .sort()
+      .reverse();
+    
+    const logs = files.map(f => {
+      const data = JSON.parse(fs.readFileSync(path.join(logsDir, f), 'utf-8'));
+      return {
+        fileName: f,
+        studentName: data.studentName,
+        department: data.department,
+        session: data.session,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        messageCount: data.conversation.length
+      };
+    });
+    res.json(logs);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// View specific session log
+app.get('/api/logs/:fileName', (req, res) => {
+  try {
+    const filePath = path.join(process.cwd(), 'logs', req.params.fileName);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: 'Log not found' });
+    }
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Generate video with Hedra API
@@ -179,9 +244,15 @@ io.on('connection', (socket) => {
     
     console.log('💬 Received message:', message);
     
+    // Log student question
+    sessionLogger.logMessage(sessionId, 'student', message);
+    
     try {
       // Get agent response
       const response = await agent.processQuestion(sessionId, message);
+      
+      // Log agent response
+      sessionLogger.logMessage(sessionId, 'patient', response);
       
       // Send response back
       socket.emit('chat-response', {
@@ -191,6 +262,7 @@ io.on('connection', (socket) => {
       console.log('✅ Response sent:', response);
     } catch (error) {
       console.error('❌ Error processing message:', error);
+      sessionLogger.logMessage(sessionId, 'system', `Error: ${error.message}`);
       socket.emit('chat-error', { error: error.message });
     }
   });
