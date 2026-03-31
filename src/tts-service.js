@@ -24,9 +24,15 @@ export class TTSService {
     }
 
     try {
-      const voice = gender === 'female' ? 'nova' : 'echo';
+      // Use more natural voices
+      const voice = gender === 'female' ? 'shimmer' : 'fable';
       
       console.log(`🔊 Generating TTS | Voice: ${voice} | Gender: ${gender} | Text: ${text.substring(0, 50)}...`);
+
+      // Enhanced instructions for more natural patient-like speech
+      const instructions = gender === 'female' 
+        ? 'تحدثي بالعربية بنبرة طبيعية ودافئة كمريضة حقيقية. أظهري القلق والتعب بشكل خفيف. تكلمي بهدوء وتعاون مع الطبيب. عبّري عن الألم والانزعاج بطريقة واقعية وإنسانية. استخدمي نبرة صوت متعبة قليلاً لكن واضحة.'
+        : 'تحدث بالعربية بنبرة طبيعية وواضحة كمريض حقيقي. أظهر القلق والألم بشكل طبيعي. تكلم بهدوء وتعاون مع الطبيب. عبّر عن الانزعاج والتعب بطريقة واقعية وإنسانية. استخدم نبرة صوت متعبة قليلاً لكن واضحة ومفهومة.';
 
       const response = await this.client.audio.speech.create({
         model: 'gpt-4o-mini-tts',
@@ -34,9 +40,7 @@ export class TTSService {
         input: text,
         speed: 1.4,
         response_format: 'mp3',
-        instructions: gender === 'female' 
-          ? 'Speak in Arabic with a natural, warm female voice. Sound like a real patient - slightly worried and tired.'
-          : 'Speak in Arabic with a natural, clear male voice. Sound like a real patient - express pain and concern naturally.'
+        instructions: instructions
       });
 
       const buffer = Buffer.from(await response.arrayBuffer());

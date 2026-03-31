@@ -99,6 +99,22 @@
         <input type="hidden" id="language-select" value="ar" />
 
         <div id="session-screen" class="screen">
+            <!-- Timer in top corner -->
+            <div class="session-timer-corner">
+                <span class="timer-icon">🕐</span>
+                <span id="session-timer">00:00</span>
+            </div>
+            
+            <!-- Large Recording Indicator Overlay -->
+            <div id="recording-overlay" class="recording-overlay hidden">
+                <div class="recording-indicator">
+                    <div class="recording-pulse"></div>
+                    <div class="recording-mic-icon">🎤</div>
+                    <div class="recording-text">يستمع الآن...</div>
+                    <div class="recording-subtext">تكلم بوضوح</div>
+                </div>
+            </div>
+            
             <div class="session-layout">
                 <div class="video-section">
                     <div id="avatar-video" class="video-container">
@@ -124,10 +140,6 @@
                                 <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
                             </svg>
                         </button>
-                        <div class="timer-box">
-                            <span id="session-timer">00:00</span>
-                            <button id="timer-toggle-btn" class="timer-btn" onclick="toggleTimer()" title="إيقاف/تشغيل المؤقت">⏸</button>
-                        </div>
                         <button id="end-btn" class="control-btn end-btn" title="إنهاء الجلسة">
                             <svg viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M16.5 2.25h3.75c.69 0 1.25.56 1.25 1.25v3.75c0 .69-.56 1.25-1.25 1.25h-3.75c-.69 0-1.25-.56-1.25-1.25V3.5c0-.69.56-1.25 1.25-1.25zm0 13.5h3.75c.69 0 1.25.56 1.25 1.25v3.75c0 .69-.56 1.25-1.25 1.25h-3.75c-.69 0-1.25-.56-1.25-1.25V17c0-.69.56-1.25 1.25-1.25zM3.75 2.25H7.5c.69 0 1.25.56 1.25 1.25v3.75c0 .69-.56 1.25-1.25 1.25H3.75C3.06 8.5 2.5 7.94 2.5 7.25V3.5c0-.69.56-1.25 1.25-1.25zm0 13.5H7.5c.69 0 1.25.56 1.25 1.25v3.75c0 .69-.56 1.25-1.25 1.25H3.75c-.69 0-1.25-.56-1.25-1.25V17c0-.69.56-1.25 1.25-1.25z"/>

@@ -113,38 +113,21 @@ function confirmStudentName() {
 // Session Timer
 let timerInterval = null;
 let timerSeconds = 0;
-let timerRunning = false;
 
 function startTimer() {
     timerSeconds = 0;
-    timerRunning = true;
     document.getElementById('session-timer').textContent = '00:00';
-    document.getElementById('timer-toggle-btn').textContent = '⏸';
     timerInterval = setInterval(() => {
-        if (timerRunning) {
-            timerSeconds++;
-            const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
-            const secs = String(timerSeconds % 60).padStart(2, '0');
-            document.getElementById('session-timer').textContent = `${mins}:${secs}`;
-        }
+        timerSeconds++;
+        const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+        const secs = String(timerSeconds % 60).padStart(2, '0');
+        document.getElementById('session-timer').textContent = `${mins}:${secs}`;
     }, 1000);
 }
 
 function stopTimer() {
     clearInterval(timerInterval);
     timerInterval = null;
-    timerRunning = false;
-}
-
-function toggleTimer() {
-    const btn = document.getElementById('timer-toggle-btn');
-    if (timerRunning) {
-        timerRunning = false;
-        btn.textContent = '▶';
-    } else {
-        timerRunning = true;
-        btn.textContent = '⏸';
-    }
 }
 
 // Load scenarios on page load
@@ -562,6 +545,8 @@ function closeImageOverlay(event) {
 // Speech Recognition Setup
 let recognition = null;
 let isRecording = false;
+let isRecognitionReady = false;
+let stopMicTimeout = null; // For grace period delay
 
 function initializeSpeechRecognition() {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -613,6 +598,37 @@ function initializeSpeechRecognition() {
                 }
             }
         };
+        
+        console.log('✅ Speech recognition initialized');
+    }
+}
+
+// Pre-warm microphone to reduce delay
+function prewarmMicrophone() {
+    if (!recognition) {
+        initializeSpeechRecognition();
+    }
+    
+    if (!recognition || isRecognitionReady) return;
+    
+    console.log('🔥 Pre-warming microphone...');
+    
+    try {
+        // Start and immediately stop to initialize the microphone
+        recognition.start();
+        
+        setTimeout(() => {
+            try {
+                recognition.stop();
+                isRecognitionReady = true;
+                console.log('✅ Microphone pre-warmed and ready!');
+            } catch (e) {
+                console.log('Pre-warm stop error (safe to ignore):', e.message);
+            }
+        }, 200);
+    } catch (e) {
+        console.log('Pre-warm error (safe to ignore):', e.message);
+        isRecognitionReady = true;
     }
 }
 
@@ -794,40 +810,76 @@ document.getElementById('mic-btn').addEventListener('click', () => {
 function startMic() {
     const micBtn = document.getElementById('mic-btn');
     const micStatus = document.getElementById('mic-status');
+    const videoSection = document.querySelector('.video-section');
+    const recordingOverlay = document.getElementById('recording-overlay');
     
     if (isRecording) return; // Already recording
+    
+    // Cancel any pending stop timeout (if user pressed Space again quickly)
+    if (stopMicTimeout) {
+        clearTimeout(stopMicTimeout);
+        stopMicTimeout = null;
+        console.log('✅ Stop timeout cancelled - continuing recording');
+        micStatus.textContent = '🔴 جاهز... تكلم الآن!';
+        return;
+    }
     
     if (!recognition) {
         initializeSpeechRecognition();
     }
     if (!recognition) return;
     
+    // ✅ INSTANT VISUAL FEEDBACK - Show immediately (0ms delay)
+    isRecording = true;
+    micBtn.classList.add('active');
+    micStatus.classList.add('recording');
+    videoSection.classList.add('recording');
+    recordingOverlay.classList.remove('hidden'); // Show large overlay
+    micStatus.textContent = '🔴 جاهز... تكلم الآن!';
+    console.log('✅ Visual feedback shown instantly');
+    
+    // Then start recognition (may have slight delay, but user sees feedback already)
     try {
         recognition.start();
-        isRecording = true;
-        micBtn.classList.add('active');
-        micStatus.textContent = '🎤 يستمع... ارفع إصبعك عن المسطرة لإرسال السؤال';
-        console.log('✅ Microphone ON');
+        console.log('✅ Microphone started');
     } catch (e) {
-        console.log('Recognition already started');
+        console.log('Recognition already started or error:', e.message);
     }
 }
 
 function stopMic() {
     const micBtn = document.getElementById('mic-btn');
     const micStatus = document.getElementById('mic-status');
+    const videoSection = document.querySelector('.video-section');
+    const recordingOverlay = document.getElementById('recording-overlay');
     
     if (!isRecording) return;
     
-    try {
-        recognition.stop();
-        isRecording = false;
-        micBtn.classList.remove('active');
-        micStatus.textContent = '🎤 اضغط مطولاً على مسطرة الكيبورد (Space) للتحدث';
-        console.log('⏸️ Microphone OFF');
-    } catch (e) {
-        console.error('Error stopping recognition:', e);
+    // Cancel any previous timeout
+    if (stopMicTimeout) {
+        clearTimeout(stopMicTimeout);
     }
+    
+    // Change status to "finishing" to indicate grace period
+    micStatus.textContent = '🔴 جاري الإنهاء... لحظة';
+    console.log('⏱️ Grace period started (400ms)');
+    
+    // Wait 400ms before actually stopping (grace period to capture last words)
+    stopMicTimeout = setTimeout(() => {
+        try {
+            recognition.stop();
+            isRecording = false;
+            micBtn.classList.remove('active');
+            micStatus.classList.remove('recording');
+            videoSection.classList.remove('recording');
+            recordingOverlay.classList.add('hidden'); // Hide large overlay
+            micStatus.textContent = '🎤 اضغط مطولاً على مسطرة الكيبورد (Space) للتحدث، ثم ارفع إصبعك لإرسال السؤال';
+            stopMicTimeout = null;
+            console.log('⏸️ Microphone OFF (after grace period)');
+        } catch (e) {
+            console.error('Error stopping recognition:', e);
+        }
+    }, 400); // 400ms grace period
 }
 
 // Spacebar keydown = start mic, keyup = stop mic
@@ -865,6 +917,12 @@ async function endSession() {
     try {
         // Stop timer
         stopTimer();
+        
+        // Cancel any pending stop mic timeout
+        if (stopMicTimeout) {
+            clearTimeout(stopMicTimeout);
+            stopMicTimeout = null;
+        }
         
         // Stop all audio immediately
         stopSpeaking();
@@ -951,6 +1009,9 @@ function initializeWebSocket() {
     
     socket.on('connect', async () => {
         console.log('✅ WebSocket connected:', socket.id);
+        
+        // Pre-warm microphone for faster response
+        prewarmMicrophone();
         
         if (currentSession && currentScenario && window._welcomeMsg) {
             addToTranscript('avatar', window._welcomeMsg);
